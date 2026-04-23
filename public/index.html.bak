@@ -660,7 +660,7 @@
         </div>
 
         <form id="authForm" class="stack">
-          <div class="form-grid auth-grid" id="authCredentialsGrid">
+          <div class="form-grid auth-grid">
             <label class="auth-signup-only hidden">
               <span>Full name</span>
               <input type="text" name="name" id="authName" placeholder="Your full name" />
@@ -669,7 +669,7 @@
               <span>Email</span>
               <input type="email" name="email" id="authEmail" placeholder="you@example.com" required />
             </label>
-            <label class="auth-password-row">
+            <label>
               <span>Password</span>
               <input type="password" name="password" id="authPassword" placeholder="Minimum 8 characters" required />
             </label>
@@ -698,20 +698,6 @@
               </select>
             </label>
           </div>
-
-          <div class="stack hidden" id="authVerifyPanel">
-            <div class="helper-card">
-              <strong>Enter your verification code</strong>
-              <p class="section-hint" id="authVerifyCopy">We sent a 6-digit code to your email.</p>
-            </div>
-            <label>
-              <span>Verification code</span>
-              <input type="text" name="verificationCode" id="authVerificationCode" inputmode="numeric" maxlength="6" placeholder="123456" />
-            </label>
-            <div class="helper-card hidden" id="authVerificationPreview"></div>
-            <button type="button" class="text-button auth-inline-action" id="authResendButton">Resend code</button>
-          </div>
-
           <p class="section-hint" id="authHint">Log in to save your booking history and apply as a business.</p>
           <button type="submit" class="primary-button primary-button--block" id="authSubmitButton">Continue</button>
         </form>

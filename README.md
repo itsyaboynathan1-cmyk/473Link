@@ -27,3 +27,15 @@ http://localhost:3000
 - Public assets now live in `public/` and runtime data is in `data/runtime.json`.
 - Operator dashboard default passcode is still `473admin` until you change it.
 - Booking and payment logic still exists under the hood, but the public-facing experience now emphasizes discovery and business visibility first.
+
+
+## Email verification with Resend
+
+To send real verification codes by email, add these Railway variables:
+
+- `RESEND_API_KEY` = your Resend API key
+- `RESEND_FROM_EMAIL` = a verified sender like `verify@yourdomain.com`
+- `RESEND_FROM_NAME` = optional, defaults to `473Link`
+- `RESEND_REPLY_TO` = optional support address
+
+If `RESEND_API_KEY` and `RESEND_FROM_EMAIL` are both present, the app sends real emails through Resend. If they are missing, the app falls back to preview mode so you can still test locally.

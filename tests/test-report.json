@@ -1,11 +1,12 @@
 {
   "passed": true,
-  "checkedAt": "2026-04-22T15:34:40.477Z",
+  "checkedAt": "2026-04-23T18:56:02.803Z",
   "checks": [
     "Config exposes built-in auth support.",
     "Home page includes login and signup UI.",
-    "User signup returns a session token.",
-    "Authenticated profile lookup works.",
+    "User signup now requires email verification.",
+    "Email verification returns a live session token.",
+    "Authenticated profile lookup works after verification.",
     "Bookings are stored against the signed-in user.",
     "Signed-in users can fetch their own booking history.",
     "Business listing submissions now require and use the signed-in account.",

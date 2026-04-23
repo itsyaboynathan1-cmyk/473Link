@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import crypto from 'crypto';
-import { Resend } from 'resend';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, 'public');
@@ -15,13 +14,6 @@ const paymentMode = process.env.PAYMENT_MODE || 'mock';
 const paymentProviderName = process.env.PAYMENT_PROVIDER_NAME || (paymentMode === 'live_link' ? 'Hosted checkout' : 'Founding partner mode');
 const paymentUrlTemplate = process.env.PAYMENT_URL_TEMPLATE || '';
 const adminPasscode = process.env.ADMIN_PASSCODE || '473admin';
-const requestedAuthEmailMode = String(process.env.AUTH_EMAIL_MODE || '').trim().toLowerCase();
-const resendApiKey = String(process.env.RESEND_API_KEY || '').trim();
-const resendFromEmail = String(process.env.RESEND_FROM_EMAIL || '').trim();
-const resendFromName = String(process.env.RESEND_FROM_NAME || '473Link').trim() || '473Link';
-const resendReplyTo = String(process.env.RESEND_REPLY_TO || '').trim();
-const resendClient = resendApiKey ? new Resend(resendApiKey) : null;
-const authEmailMode = requestedAuthEmailMode || (resendClient && resendFromEmail ? 'resend' : 'preview');
 const adminSessions = new Set();
 const userSessions = new Map();
 const starterProviderCount = 8;
@@ -91,83 +83,7 @@ function sanitiseUser(user = {}) {
     phone: String(user.phone || ''),
     parish: String(user.parish || ''),
     accountType: String(user.accountType || 'customer'),
-    isVerified: Boolean(user.isVerified),
     createdAt: String(user.createdAt || '')
-  };
-}
-
-function generateVerificationCode() {
-  return String(Math.floor(100000 + Math.random() * 900000));
-}
-
-function verificationExpiry(minutes = 15) {
-  return new Date(Date.now() + minutes * 60 * 1000).toISOString();
-}
-
-function buildVerificationDelivery(user) {
-  const payload = {
-    mode: authEmailMode,
-    email: String(user.email || ''),
-    expiresAt: user.verificationExpiresAt || verificationExpiry()
-  };
-  if (authEmailMode === 'preview') {
-    payload.previewCode = String(user.verificationCode || '');
-  }
-  return payload;
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#39;');
-}
-
-function buildVerificationEmailHtml(user) {
-  const code = escapeHtml(String(user.verificationCode || ''));
-  const name = escapeHtml(String(user.name || 'there'));
-  const expiry = escapeHtml(String(user.verificationExpiresAt || ''));
-  return `
-    <div style="font-family:Inter,Arial,sans-serif;background:#f5f7fb;padding:24px;color:#07111d;">
-      <div style="max-width:560px;margin:0 auto;background:#ffffff;border-radius:18px;padding:32px;border:1px solid #e8edf4;">
-        <div style="font-size:24px;font-weight:800;margin-bottom:12px;color:#d61f26;">473Link</div>
-        <p style="margin:0 0 12px;font-size:16px;">Hi ${name},</p>
-        <p style="margin:0 0 16px;font-size:16px;line-height:1.6;">Use this verification code to finish creating your 473Link account.</p>
-        <div style="margin:24px 0;padding:20px;border-radius:16px;background:#07111d;color:#ffffff;text-align:center;">
-          <div style="font-size:13px;letter-spacing:.08em;text-transform:uppercase;opacity:.75;margin-bottom:8px;">Verification code</div>
-          <div style="font-size:36px;font-weight:800;letter-spacing:.2em;">${code}</div>
-        </div>
-        <p style="margin:0 0 8px;font-size:14px;line-height:1.6;color:#44556b;">This code expires at ${expiry}.</p>
-        <p style="margin:0;font-size:14px;line-height:1.6;color:#44556b;">If you didn’t request this, you can ignore this email.</p>
-      </div>
-    </div>
-  `;
-}
-
-async function deliverVerificationEmail(user) {
-  const delivery = buildVerificationDelivery(user);
-  if (authEmailMode !== 'resend') return delivery;
-  if (!resendClient || !resendFromEmail) {
-    throw new Error('Resend email delivery is not configured. Add RESEND_API_KEY and RESEND_FROM_EMAIL.');
-  }
-  const from = resendFromEmail.includes('<') ? resendFromEmail : `${resendFromName} <${resendFromEmail}>`;
-  const emailPayload = {
-    from,
-    to: [String(user.email || '').trim()],
-    subject: 'Your 473Link verification code',
-    html: buildVerificationEmailHtml(user)
-  };
-  if (resendReplyTo) emailPayload.replyTo = resendReplyTo;
-  const { data, error } = await resendClient.emails.send(emailPayload);
-  if (error) {
-    const message = typeof error === 'string' ? error : (error.message || 'Unable to send verification email.');
-    throw new Error(message);
-  }
-  return {
-    ...delivery,
-    emailId: data?.id || ''
   };
 }
 
@@ -180,9 +96,6 @@ function createUserFromBody(body = {}) {
     phone: String(body.phone || '').trim(),
     parish: String(body.parish || '').trim(),
     accountType: ['customer', 'business'].includes(String(body.accountType || 'customer')) ? String(body.accountType || 'customer') : 'customer',
-    isVerified: toBoolean(body.isVerified),
-    verificationCode: String(body.verificationCode || ''),
-    verificationExpiresAt: body.verificationExpiresAt ? String(body.verificationExpiresAt) : null,
     createdAt: String(body.createdAt || new Date().toISOString())
   };
   return user;
@@ -318,10 +231,7 @@ function normaliseRuntime(raw) {
     ? parsed.users
         .map((entry) => createUserFromBody({
           ...entry,
-          passwordHash: String(entry.passwordHash || ''),
-          isVerified: typeof entry.isVerified === 'boolean' ? entry.isVerified : true,
-          verificationCode: String(entry.verificationCode || ''),
-          verificationExpiresAt: entry.verificationExpiresAt ? String(entry.verificationExpiresAt) : null
+          passwordHash: String(entry.passwordHash || '')
         }))
         .filter((entry) => entry.email && entry.passwordHash)
     : [];
@@ -578,9 +488,7 @@ const server = http.createServer(async (req, res) => {
       supportEmail: 'hello@473link.app',
       showStarterListings: runtime.settings.showStarterListings,
       hiddenStarterIds: runtime.settings.hiddenStarterIds || [],
-      authEnabled: true,
-      authEmailMode,
-      authEmailConfigured: authEmailMode === 'resend'
+      authEnabled: true
     });
   }
 
@@ -602,21 +510,6 @@ const server = http.createServer(async (req, res) => {
       const runtime = getRuntime();
       const exists = runtime.users.find((entry) => entry.email === email);
       if (exists) {
-        if (!exists.isVerified) {
-          exists.verificationCode = generateVerificationCode();
-          exists.verificationExpiresAt = verificationExpiry();
-          saveRuntime(runtime);
-          const delivery = await deliverVerificationEmail(exists);
-          return sendJson(res, 200, {
-            ok: true,
-            requiresVerification: true,
-            email,
-            delivery,
-            message: authEmailMode === 'resend'
-              ? 'This account is waiting for email verification. Check your inbox for the new code.'
-              : 'This account is waiting for email verification. Use the new code to finish setup.'
-          });
-        }
         return sendJson(res, 409, { error: 'An account with that email already exists.' });
       }
 
@@ -626,93 +519,17 @@ const server = http.createServer(async (req, res) => {
         passwordHash: hashPassword(password),
         phone,
         parish,
-        accountType,
-        isVerified: false,
-        verificationCode: generateVerificationCode(),
-        verificationExpiresAt: verificationExpiry()
+        accountType
       });
 
       runtime.users.push(user);
       saveRuntime(runtime);
-      const delivery = await deliverVerificationEmail(user);
 
-      return sendJson(res, 201, {
-        ok: true,
-        requiresVerification: true,
-        email,
-        delivery,
-        message: authEmailMode === 'resend'
-          ? 'Account created. Check your email for a verification code.'
-          : 'Account created. Verify your email to continue.'
-      });
-    } catch (error) {
-      return sendJson(res, 400, { error: error.message || 'Unable to create account.' });
-    }
-  }
-
-  if (pathname === '/api/auth/verify-email' && req.method === 'POST') {
-    try {
-      const body = await readBody(req);
-      const email = String(body.email || '').trim().toLowerCase();
-      const code = String(body.code || '').trim();
-      if (!email || !code) {
-        return sendJson(res, 400, { error: 'Email and verification code are required.' });
-      }
-      const runtime = getRuntime();
-      const user = runtime.users.find((entry) => entry.email === email);
-      if (!user) {
-        return sendJson(res, 404, { error: 'We could not find that account.' });
-      }
-      if (user.isVerified) {
-        const token = createId('AUT');
-        userSessions.set(token, user.id);
-        return sendJson(res, 200, { token, user: sanitiseUser(user), alreadyVerified: true });
-      }
-      if (!user.verificationCode || user.verificationCode !== code) {
-        return sendJson(res, 400, { error: 'That verification code is not correct.' });
-      }
-      if (!user.verificationExpiresAt || Number.isNaN(new Date(user.verificationExpiresAt).getTime()) || new Date(user.verificationExpiresAt) < new Date()) {
-        return sendJson(res, 400, { error: 'That verification code has expired. Request a new one.' });
-      }
-      user.isVerified = true;
-      user.verificationCode = '';
-      user.verificationExpiresAt = null;
-      saveRuntime(runtime);
       const token = createId('AUT');
       userSessions.set(token, user.id);
-      return sendJson(res, 200, { token, user: sanitiseUser(user), message: 'Email verified. You are now signed in.' });
+      return sendJson(res, 201, { token, user: sanitiseUser(user) });
     } catch (error) {
-      return sendJson(res, 400, { error: error.message || 'Unable to verify email.' });
-    }
-  }
-
-  if (pathname === '/api/auth/resend-verification' && req.method === 'POST') {
-    try {
-      const body = await readBody(req);
-      const email = String(body.email || '').trim().toLowerCase();
-      if (!email) {
-        return sendJson(res, 400, { error: 'Email is required.' });
-      }
-      const runtime = getRuntime();
-      const user = runtime.users.find((entry) => entry.email === email);
-      if (!user) {
-        return sendJson(res, 404, { error: 'We could not find that account.' });
-      }
-      if (user.isVerified) {
-        return sendJson(res, 200, { ok: true, alreadyVerified: true, message: 'That email is already verified.' });
-      }
-      user.verificationCode = generateVerificationCode();
-      user.verificationExpiresAt = verificationExpiry();
-      saveRuntime(runtime);
-      const delivery = await deliverVerificationEmail(user);
-      return sendJson(res, 200, {
-        ok: true,
-        email,
-        delivery,
-        message: authEmailMode === 'resend' ? 'A new verification code was sent to your email.' : 'A new verification code is ready.'
-      });
-    } catch (error) {
-      return sendJson(res, 400, { error: error.message || 'Unable to resend verification code.' });
+      return sendJson(res, 400, { error: error.message || 'Unable to create account.' });
     }
   }
 
@@ -725,20 +542,6 @@ const server = http.createServer(async (req, res) => {
       const user = runtime.users.find((entry) => entry.email === email);
       if (!user || !verifyPassword(password, user.passwordHash)) {
         return sendJson(res, 401, { error: 'Incorrect email or password.' });
-      }
-      if (!user.isVerified) {
-        if (!user.verificationCode || !user.verificationExpiresAt || new Date(user.verificationExpiresAt) < new Date()) {
-          user.verificationCode = generateVerificationCode();
-          user.verificationExpiresAt = verificationExpiry();
-          saveRuntime(runtime);
-        }
-        const delivery = await deliverVerificationEmail(user);
-        return sendJson(res, 403, {
-          error: 'Please verify your email before logging in.',
-          requiresVerification: true,
-          email,
-          delivery
-        });
       }
       const token = createId('AUT');
       userSessions.set(token, user.id);

@@ -76,14 +76,29 @@ try {
   });
   const signupData = await signupResponse.json();
   assert.equal(signupResponse.status, 201);
-  assert.ok(signupData.token);
-  checks.push('User signup returns a session token.');
+  assert.equal(signupData.requiresVerification, true);
+  assert.ok(signupData.delivery?.previewCode);
+  checks.push('User signup now requires email verification.');
 
-  const authHeaders = { 'x-auth-token': signupData.token, 'Content-Type': 'application/json' };
+  const verifyResponse = await fetch(`${baseUrl}/api/auth/verify-email`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: 'asha@example.com',
+      code: signupData.delivery.previewCode
+    })
+  });
+  const verifyData = await verifyResponse.json();
+  assert.equal(verifyResponse.status, 200);
+  assert.ok(verifyData.token);
+  checks.push('Email verification returns a live session token.');
 
-  const me = await fetch(`${baseUrl}/api/auth/me`, { headers: { 'x-auth-token': signupData.token } }).then((res) => res.json());
+  const authHeaders = { 'x-auth-token': verifyData.token, 'Content-Type': 'application/json' };
+
+  const me = await fetch(`${baseUrl}/api/auth/me`, { headers: { 'x-auth-token': verifyData.token } }).then((res) => res.json());
   assert.equal(me.user.email, 'asha@example.com');
-  checks.push('Authenticated profile lookup works.');
+  assert.equal(me.user.isVerified, true);
+  checks.push('Authenticated profile lookup works after verification.');
 
   const bookingResponse = await fetch(`${baseUrl}/api/bookings`, {
     method: 'POST',
@@ -108,11 +123,11 @@ try {
   });
   const bookingData = await bookingResponse.json();
   assert.equal(bookingResponse.status, 201);
-  assert.equal(bookingData.booking.userId, signupData.user.id);
+  assert.equal(bookingData.booking.userId, verifyData.user.id);
   checks.push('Bookings are stored against the signed-in user.');
 
   const myBookings = await fetch(`${baseUrl}/api/my/bookings`, {
-    headers: { 'x-auth-token': signupData.token }
+    headers: { 'x-auth-token': verifyData.token }
   }).then((res) => res.json());
   assert.equal(myBookings.bookings.length, 1);
   checks.push('Signed-in users can fetch their own booking history.');
@@ -130,7 +145,7 @@ try {
   });
   const listingData = await listingResponse.json();
   assert.equal(listingResponse.status, 201);
-  assert.equal(listingData.listing.userId, signupData.user.id);
+  assert.equal(listingData.listing.userId, verifyData.user.id);
   checks.push('Business listing submissions now require and use the signed-in account.');
 
   const adminLoginResponse = await fetch(`${baseUrl}/api/admin/login`, {

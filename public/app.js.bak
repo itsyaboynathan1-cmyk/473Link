@@ -255,11 +255,6 @@ const state = {
   userToken: localStorage.getItem(STORAGE.userToken) || '',
   user: null,
   authMode: 'login',
-  authVerification: {
-    email: '',
-    previewCode: '',
-    mode: 'preview'
-  },
   dashboard: null,
   selectedService: null,
   pendingBooking: null
@@ -344,7 +339,6 @@ const els = {
   accountPanelSecondary: document.querySelector('#accountPanelSecondary'),
   authModal: document.querySelector('#authModal'),
   authForm: document.querySelector('#authForm'),
-  authCredentialsGrid: document.querySelector('#authCredentialsGrid'),
   authTitle: document.querySelector('#authTitle'),
   authSubtitle: document.querySelector('#authSubtitle'),
   authHint: document.querySelector('#authHint'),
@@ -357,10 +351,6 @@ const els = {
   authPhone: document.querySelector('#authPhone'),
   authParish: document.querySelector('#authParish'),
   authAccountType: document.querySelector('#authAccountType'),
-  authVerifyPanel: document.querySelector('#authVerifyPanel'),
-  authVerificationCode: document.querySelector('#authVerificationCode'),
-  authVerificationPreview: document.querySelector('#authVerificationPreview'),
-  authResendButton: document.querySelector('#authResendButton'),
   authSignupOnly: Array.from(document.querySelectorAll('.auth-signup-only')),
   toastRegion: document.querySelector('#toastRegion')
 };
@@ -656,31 +646,6 @@ function normalisePhone(value) {
   return trimmed;
 }
 
-function setVerificationState(email = '', delivery = null) {
-  state.authVerification = {
-    email: String(email || '').trim().toLowerCase(),
-    previewCode: String(delivery?.previewCode || ''),
-    mode: String(delivery?.mode || 'preview')
-  };
-}
-
-function clearVerificationState() {
-  state.authVerification = { email: '', previewCode: '', mode: 'preview' };
-  if (els.authVerificationCode) els.authVerificationCode.value = '';
-}
-
-function renderVerificationPreview() {
-  if (!els.authVerificationPreview) return;
-  const previewCode = state.authVerification.previewCode;
-  const isPreview = state.authVerification.mode === 'preview' && previewCode;
-  els.authVerificationPreview.classList.toggle('hidden', !isPreview);
-  if (isPreview) {
-    els.authVerificationPreview.innerHTML = `<strong>Verification preview</strong><p class="section-hint">Email sending is not configured yet, so use code <strong>${escapeHtml(previewCode)}</strong> to continue.</p>`;
-  } else {
-    els.authVerificationPreview.innerHTML = '';
-  }
-}
-
 function updateAuthUi() {
   const loggedIn = Boolean(state.user);
   els.authControls?.classList.toggle('hidden', loggedIn);
@@ -713,57 +678,26 @@ function updateAuthUi() {
 
 function syncAuthMode() {
   const isSignup = state.authMode === 'signup';
-  const isVerify = state.authMode === 'verify';
-
-  els.authTitle.textContent = isVerify
-    ? 'Verify your email'
-    : isSignup
-      ? 'Create your 473Link account'
-      : 'Log in to 473Link';
-
-  els.authSubtitle.textContent = isVerify
-    ? 'Use the 6-digit code we sent to finish setting up your account.'
-    : isSignup
-      ? 'Create one account for discovery, partner onboarding, and launch updates.'
-      : 'Use one account for business onboarding and early access.';
-
-  els.authHint.textContent = isVerify
-    ? `We need to confirm ${state.authVerification.email || 'your email'} before you can continue.`
-    : isSignup
-      ? 'Business owners can sign up once, then apply with pre-filled contact details.'
-      : 'Log in to save your profile and apply as a business.';
-
-  els.authSubmitButton.textContent = isVerify ? 'Verify email' : (isSignup ? 'Create account' : 'Log in');
-  els.authModeLogin.classList.toggle('active', !isSignup && !isVerify);
+  els.authTitle.textContent = isSignup ? 'Create your 473Link account' : 'Log in to 473Link';
+  els.authSubtitle.textContent = isSignup
+    ? 'Create one account for discovery, partner onboarding, and launch updates.'
+    : 'Use one account for business onboarding and early access.';
+  els.authHint.textContent = isSignup
+    ? 'Business owners can sign up once, then apply with pre-filled contact details.'
+    : 'Log in to save your profile and apply as a business.';
+  els.authSubmitButton.textContent = isSignup ? 'Create account' : 'Log in';
+  els.authModeLogin.classList.toggle('active', !isSignup);
   els.authModeSignup.classList.toggle('active', isSignup);
-  els.authModeLogin.disabled = isVerify;
-  els.authModeSignup.disabled = isVerify;
-  els.authCredentialsGrid?.classList.toggle('hidden', isVerify);
-  els.authVerifyPanel?.classList.toggle('hidden', !isVerify);
-  els.authSignupOnly.forEach((node) => node.classList.toggle('hidden', !isSignup || isVerify));
-
-  const passwordRequired = !isVerify;
-  if (passwordRequired) els.authPassword?.setAttribute('required', 'required');
-  else els.authPassword?.removeAttribute('required');
-
+  els.authSignupOnly.forEach((node) => node.classList.toggle('hidden', !isSignup));
   [els.authName, els.authPhone, els.authParish, els.authAccountType].forEach((field) => {
     if (!field) return;
-    if (isSignup && !isVerify) field.setAttribute('required', 'required');
+    if (isSignup) field.setAttribute('required', 'required');
     else field.removeAttribute('required');
   });
-
-  if (els.authVerificationCode) {
-    if (isVerify) els.authVerificationCode.setAttribute('required', 'required');
-    else els.authVerificationCode.removeAttribute('required');
-  }
-
-  renderVerificationPreview();
 }
 
-function openAuth(mode = 'login', verification = null) {
+function openAuth(mode = 'login') {
   state.authMode = mode;
-  if (mode !== 'verify') clearVerificationState();
-  if (verification) setVerificationState(verification.email, verification.delivery);
   syncAuthMode();
   openSurface(els.authModal);
 }
@@ -858,7 +792,6 @@ async function handleLogout(showMessage = true) {
   state.userToken = '';
   state.user = null;
   state.bookings = [];
-  clearVerificationState();
   saveLocalState();
   updateAuthUi();
   renderBookings();
@@ -867,72 +800,30 @@ async function handleLogout(showMessage = true) {
 
 async function submitAuthForm(event) {
   event.preventDefault();
+  const formData = new FormData(els.authForm);
+  const isSignup = state.authMode === 'signup';
+  const payload = {
+    name: formData.get('name'),
+    email: String(formData.get('email') || '').trim(),
+    password: String(formData.get('password') || ''),
+    phone: formData.get('phone'),
+    parish: formData.get('parish'),
+    accountType: formData.get('accountType')
+  };
+
   const button = els.authSubmitButton;
   const originalText = button.textContent;
-  const isSignup = state.authMode === 'signup';
-  const isVerify = state.authMode === 'verify';
-
   button.disabled = true;
-  button.textContent = isVerify ? 'Verifying…' : (isSignup ? 'Creating account…' : 'Logging in…');
+  button.textContent = isSignup ? 'Creating account…' : 'Logging in…';
 
   try {
-    if (isVerify) {
-      const response = await fetch('/api/auth/verify-email', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: state.authVerification.email || String(els.authEmail?.value || '').trim(),
-          code: String(els.authVerificationCode?.value || '').trim()
-        })
-      });
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Unable to verify email.');
-      state.user = data.user;
-      state.userToken = data.token;
-      saveLocalState();
-      els.authForm.reset();
-      clearVerificationState();
-      closeSurface(els.authModal);
-      updateAuthUi();
-      prefillFormsFromUser();
-      await fetchMyBookings();
-      showToast(data.message || 'Email verified. You are now signed in.');
-      return;
-    }
-
-    const formData = new FormData(els.authForm);
-    const payload = {
-      name: formData.get('name'),
-      email: String(formData.get('email') || '').trim(),
-      password: String(formData.get('password') || ''),
-      phone: formData.get('phone'),
-      parish: formData.get('parish'),
-      accountType: formData.get('accountType')
-    };
-
     const response = await fetch(isSignup ? '/api/auth/signup' : '/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
     });
     const data = await response.json();
-    if (!response.ok) {
-      if (data.requiresVerification) {
-        setVerificationState(data.email || payload.email, data.delivery);
-        state.authMode = 'verify';
-        syncAuthMode();
-      }
-      throw new Error(data.error || 'Unable to continue.');
-    }
-
-    if (data.requiresVerification) {
-      setVerificationState(data.email || payload.email, data.delivery);
-      state.authMode = 'verify';
-      syncAuthMode();
-      showToast(data.message || 'Check your email for a verification code.');
-      return;
-    }
-
+    if (!response.ok) throw new Error(data.error || 'Unable to continue.');
     state.user = data.user;
     state.userToken = data.token;
     saveLocalState();
@@ -943,10 +834,7 @@ async function submitAuthForm(event) {
     await fetchMyBookings();
     showToast(isSignup ? 'Account created. You are now signed in.' : 'Welcome back.');
   } catch (error) {
-    if (/verify/i.test(error.message) && state.authVerification.email) {
-      state.authMode = 'verify';
-      syncAuthMode();
-    } else if (/log in|session|account/i.test(error.message)) {
+    if (/log in|session|account/i.test(error.message)) {
       openAuth('login');
     }
     showToast(error.message, 'error');
@@ -956,38 +844,7 @@ async function submitAuthForm(event) {
   }
 }
 
-async function resendVerificationCode() {
-  const email = state.authVerification.email || String(els.authEmail?.value || '').trim();
-  if (!email) {
-    showToast('Enter your email first.', 'error');
-    return;
-  }
-  const button = els.authResendButton;
-  const originalText = button.textContent;
-  button.disabled = true;
-  button.textContent = 'Sending…';
-  try {
-    const response = await fetch('/api/auth/resend-verification', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
-    });
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || 'Unable to resend code.');
-    setVerificationState(email, data.delivery);
-    state.authMode = 'verify';
-    syncAuthMode();
-    showToast(data.message || 'A new verification code is ready.');
-  } catch (error) {
-    showToast(error.message, 'error');
-  } finally {
-    button.disabled = false;
-    button.textContent = originalText;
-  }
-}
-
 function buildHeroStats() {
-
   const services = state.services;
   if (!services.length) {
     els.heroStats.innerHTML = `
@@ -2152,10 +2009,7 @@ function bindEvents() {
     }
     openAuth('signup');
   });
-  els.logoutButton?.addEventListener('click', async () => {
-    await handleLogout();
-    closeAllSurfaces();
-  });
+  els.logoutButton?.addEventListener('click', () => handleLogout());
   els.authModeLogin?.addEventListener('click', () => {
     state.authMode = 'login';
     syncAuthMode();
@@ -2165,7 +2019,6 @@ function bindEvents() {
     syncAuthMode();
   });
   els.authForm?.addEventListener('submit', submitAuthForm);
-  els.authResendButton?.addEventListener('click', resendVerificationCode);
 
   els.modalBackdrop.addEventListener('click', closeAllSurfaces);
   els.bookingForm.addEventListener('submit', submitBooking);
