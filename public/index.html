@@ -1,0 +1,721 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#d61f26" />
+    <title>473Link | Grenada Business Discovery</title>
+    <meta
+      name="description"
+      content="Discover Grenadian businesses, services, and opportunities in one premium mobile-first platform."
+    />
+    <link rel="manifest" href="/manifest.json?v=6" />
+    <link rel="icon" href="/icon.svg?v=6" type="image/svg+xml" />
+    <link rel="icon" href="/icon-192.png?v=6" type="image/png" />
+    <link rel="apple-touch-icon" href="/icon-192.png?v=6" />
+    <link rel="stylesheet" href="/styles.css?v=6" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a href="#hero" class="brand" aria-label="473Link home">
+          <img src="/icon-192.png?v=6" alt="" class="brand__icon" width="56" height="56" />
+          <span>
+            <strong>473Link</strong>
+            <small>Connect people, businesses, and opportunities.</small>
+          </span>
+        </a>
+
+        <nav class="desktop-nav" aria-label="Primary navigation">
+          <a href="#explore">Explore</a>
+          <a href="#business">For businesses</a>
+          <a href="#business">Partners</a>
+          <a href="#dashboard">Dashboard</a>
+        </nav>
+
+        <div class="topbar__actions">
+          <button type="button" class="ghost-button" id="openBusinessModal">List your business</button>
+          <div class="auth-controls" id="authControls">
+            <button type="button" class="ghost-button" id="openLoginButton">Log in</button>
+            <button type="button" class="primary-button" id="openSignupButton">Sign up</button>
+          </div>
+          <div class="account-chip hidden" id="accountChip">
+            <div>
+              <strong id="accountChipName">Guest</strong>
+              <small id="accountChipMeta">Signed out</small>
+            </div>
+            <button type="button" class="text-button" id="logoutButton">Log out</button>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <section class="hero" id="hero">
+          <div class="hero__copy">
+            <p class="eyebrow">Built for Grenada</p>
+            <h1>Discover Grenadian businesses, services, and opportunities in one place.</h1>
+            <p class="hero__lede">
+              473Link helps people find what they need faster while giving local businesses more visibility, better discovery, and real growth across Grenada.
+            </p>
+
+            <div class="hero-search card">
+              <label class="sr-only" for="searchInput">Search providers</label>
+              <input
+                id="searchInput"
+                type="search"
+                placeholder="Search auto parts, restaurants, marine, logistics, services..."
+                autocomplete="off"
+              />
+              <button type="button" class="primary-button" id="searchButton">Explore now</button>
+            </div>
+
+            <div class="hero__stats" id="heroStats"></div>
+          </div>
+
+          <aside class="hero__panel card">
+            <div class="hero__panel-top">
+              <span class="status-pill status-pill--live">Founding partners open</span>
+              <span class="status-pill" id="paymentModeBadge">Checking payments…</span>
+            </div>
+            <div class="hero__availability">
+              <div>
+                <span class="metric-label">Launch phase</span>
+                <strong>Month one</strong>
+              </div>
+              <div>
+                <span class="metric-label">Business access</span>
+                <strong>Invite + approve</strong>
+              </div>
+            </div>
+            <ul class="feature-list">
+              <li>Early business partners get visibility before public rollout</li>
+              <li>People can discover businesses, services, and opportunities faster</li>
+              <li>Founding partners are approved first so quality stays high</li>
+            </ul>
+            <article class="account-panel" id="accountPanel">
+              <strong id="accountPanelTitle">Create an account to join early</strong>
+              <p class="muted" id="accountPanelCopy">Sign in once to save your profile, submit your business, and join the early network.</p>
+              <div class="account-panel__actions" id="accountPanelActions">
+                <button type="button" class="primary-button" id="accountPanelPrimary">Log in</button>
+                <button type="button" class="ghost-button" id="accountPanelSecondary">Sign up</button>
+              </div>
+            </article>
+            <div class="hero__mini" id="miniFeatured"></div>
+          </aside>
+        </section>
+
+        <section class="section section--featured" id="featuredSection">
+          <div class="section__header">
+            <div>
+              <p class="eyebrow">Featured</p>
+              <h2>Featured businesses</h2>
+            </div>
+            <p class="section__copy">Founding partners and standout businesses get premium placement here.</p>
+          </div>
+          <div class="featured-strip" id="featuredStrip" aria-live="polite"></div>
+        </section>
+
+        <section class="section" id="explore">
+          <div class="section__header">
+            <div>
+              <p class="eyebrow">Explore</p>
+              <h2>Businesses people are already looking for</h2>
+            </div>
+            <p class="section__copy">
+              Search by category, filter by parish, and open a business profile in seconds from one clean mobile-first experience.
+            </p>
+          </div>
+
+          <div class="filters card">
+            <div class="filters__chips" id="categoryChips"></div>
+            <div class="filters__controls">
+              <label>
+                <span>Parish</span>
+                <select id="parishFilter"></select>
+              </label>
+              <label>
+                <span>Sort</span>
+                <select id="sortFilter">
+                  <option value="recommended">Recommended</option>
+                  <option value="rating">Highest rated</option>
+                  <option value="price">Lowest starting price</option>
+                  <option value="response">Fastest response</option>
+                </select>
+              </label>
+              <label class="toggle">
+                <input type="checkbox" id="sameDayFilter" />
+                <span>Same-day only</span>
+              </label>
+            </div>
+          </div>
+
+          <div class="results-bar">
+            <p id="resultsLabel">Loading services…</p>
+            <button type="button" class="text-button" id="resetFilters">Reset filters</button>
+          </div>
+
+          <div class="services-grid" id="servicesGrid" aria-live="polite"></div>
+        </section>
+
+        <section class="section" id="business">
+          <div class="section__header">
+            <div>
+              <p class="eyebrow">For businesses</p>
+              <h2>Get discovered, contacted, and remembered faster</h2>
+            </div>
+            <p class="section__copy">
+              473Link uses an approval-first workflow so early partner businesses can join, get reviewed, and go live with clean high-trust profiles.
+            </p>
+          </div>
+
+          <div class="business-grid">
+            <article class="card pitch-card">
+              <h3>Why businesses join 473Link</h3>
+              <ul class="feature-list feature-list--compact">
+                <li>Get discovered by people already searching for what you offer</li>
+                <li>Get early visibility as a founding partner before public rollout</li>
+                <li>Keep your profile private until everything is approved and polished</li>
+                <li>Let customers call, WhatsApp, and discover you from one place</li>
+              </ul>
+              <button type="button" class="primary-button" id="businessPitchButton">Submit a listing</button>
+            </article>
+
+            <article class="card pitch-card">
+              <h3>How founding partner onboarding works</h3>
+              <div class="price-stack">
+                <div>
+                  <span class="metric-label">Step 1</span>
+                  <strong>Share your business basics</strong>
+                  <p class="muted">Start with your business name, phone, category, parish, and a short description.</p>
+                </div>
+                <div>
+                  <span class="metric-label">Step 2</span>
+                  <strong>Review and polish</strong>
+                  <p class="muted">Your profile stays private while we clean up details and prepare it for launch.</p>
+                </div>
+                <div>
+                  <span class="metric-label">Step 3</span>
+                  <strong>Go live and get discovered</strong>
+                  <p class="muted">Approved businesses appear in search and can receive calls, WhatsApp messages, and profile views.</p>
+                </div>
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="bookings">
+          <div class="section__header">
+            <div>
+              <p class="eyebrow">Hidden</p>
+              <h2>Booking tools are ready when you are</h2>
+            </div>
+            <p class="section__copy">The booking and receipt engine is still available in the background, but the public launch experience is now focused on discovery and partner onboarding first.</p>
+          </div>
+
+          <div class="bookings-layout">
+            <article class="card bookings-card">
+              <div class="section__header section__header--tight">
+                <h3>Recent bookings</h3>
+                <button type="button" class="text-button" id="clearLocalButton">Sign in to view</button>
+              </div>
+              <div class="stack" id="bookingsList"></div>
+            </article>
+
+            <article class="card receipt-card">
+              <h3>Receipt preview</h3>
+              <p class="muted">After a customer pays their deposit, a receipt appears here automatically.</p>
+              <div class="receipt receipt--empty" id="receiptPreview">Make a booking to generate a receipt.</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="section" id="dashboard">
+          <div class="section__header">
+            <div>
+              <p class="eyebrow">Operator dashboard</p>
+              <h2>Review listings and control what goes public</h2>
+            </div>
+            <p class="section__copy">
+              The operator view is now locked. Use the passcode to approve new businesses, manage featured profiles, and hide starter listings when you are ready.
+            </p>
+          </div>
+
+          <article class="card admin-lock" id="dashboardLocked">
+            <div>
+              <span class="status-pill">Protected view</span>
+              <h3>Unlock operator tools</h3>
+              <p class="muted">Pending businesses are private until an operator approves them.</p>
+            </div>
+            <form id="adminLoginForm" class="admin-login-form">
+              <label>
+                <span>Operator passcode</span>
+                <input type="password" name="passcode" id="adminPasscode" placeholder="Enter passcode" required />
+              </label>
+              <button type="submit" class="primary-button">Unlock dashboard</button>
+            </form>
+          </article>
+
+          <div id="dashboardContent" class="hidden">
+            <div class="dashboard-grid" id="dashboardMetrics"></div>
+
+            <div class="card admin-toolbar">
+              <label class="toggle toggle--stack">
+                <input type="checkbox" id="starterListingsToggle" />
+                <span>
+                  <strong>Show starter listings</strong>
+                  <small>Turn this off once your real businesses are approved and ready.</small>
+                </span>
+              </label>
+              <div class="admin-toolbar__actions">
+                <button type="button" class="ghost-button" id="resetPlatformButton">Reset saved platform data</button>
+                <button type="button" class="text-button" id="adminLogoutButton">Lock dashboard</button>
+              </div>
+            </div>
+
+            <div class="dashboard-panels">
+              <article class="card table-card">
+                <div class="section__header section__header--tight">
+                  <h3>Latest bookings</h3>
+                  <span class="muted">Operator-only booking activity</span>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Service</th>
+                        <th>Customer</th>
+                        <th>When</th>
+                        <th>Status</th>
+                        <th>Due now</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dashboardBookingRows"></tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="card table-card">
+                <div class="section__header section__header--tight">
+                  <h3>Pending review queue</h3>
+                  <span class="muted">New listings stay private until approved</span>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Business</th>
+                        <th>Listing</th>
+                        <th>Plan</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="reviewQueueRows"></tbody>
+                  </table>
+                </div>
+              </article>
+            </div>
+
+            <div class="dashboard-panels dashboard-panels--stacked">
+              <article class="card table-card">
+                <div class="section__header section__header--tight">
+                  <h3>Approved listings</h3>
+                  <span class="muted">Feature, verify, or remove approved profiles</span>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Business</th>
+                        <th>Status</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="approvedListingRows"></tbody>
+                  </table>
+                </div>
+              </article>
+
+              <article class="card table-card">
+                <div class="section__header section__header--tight">
+                  <h3>Rejected listings</h3>
+                  <span class="muted">Restore or permanently remove old submissions</span>
+                </div>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Business</th>
+                        <th>Reason context</th>
+                        <th>Updated</th>
+                        <th>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody id="rejectedListingRows"></tbody>
+                  </table>
+                </div>
+              </article>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer class="footer">
+        <p><strong>473Link</strong> is built for Grenada and designed to feel good on phone first.</p>
+        <p>Founding partner onboarding, approval controls, and customer accounts are already built in so you can keep adding real businesses as you prepare for launch.</p>
+      </footer>
+
+      <nav class="mobile-nav" aria-label="Mobile navigation">
+        <a href="#hero" class="mobile-nav__item">Home</a>
+        <a href="#explore" class="mobile-nav__item">Explore</a>
+        <a href="#business" class="mobile-nav__item">Partners</a>
+        <a href="#dashboard" class="mobile-nav__item">Admin</a>
+      </nav>
+    </div>
+
+    <div class="modal-backdrop hidden" id="modalBackdrop"></div>
+
+    <aside class="drawer hidden" id="detailsDrawer" aria-modal="true" role="dialog" aria-labelledby="drawerTitle">
+      <button type="button" class="icon-button drawer__close" data-close="detailsDrawer" aria-label="Close details">×</button>
+      <div class="drawer__content" id="detailsContent"></div>
+    </aside>
+
+    <section class="modal hidden" id="bookingModal" aria-modal="true" role="dialog" aria-labelledby="bookingTitle">
+      <div class="modal__panel">
+        <button type="button" class="icon-button modal__close" data-close="bookingModal" aria-label="Close booking">×</button>
+        <div class="section__header section__header--tight">
+          <div>
+            <p class="eyebrow">Book now</p>
+            <h3 id="bookingTitle">Service booking</h3>
+          </div>
+          <span class="muted" id="bookingMeta"></span>
+        </div>
+
+        <form id="bookingForm" class="stack">
+          <div class="helper-card helper-card--booking-intro">
+            <strong>Start by sending your request.</strong>
+            <p id="bookingGuidance">The provider will review the job and confirm the next step with you.</p>
+          </div>
+
+          <div class="form-grid">
+            <label>
+              <span>Name</span>
+              <input type="text" name="customerName" placeholder="Your full name" required />
+            </label>
+            <label>
+              <span>Phone</span>
+              <input type="tel" name="customerPhone" placeholder="(473) 000-0000" required />
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" name="customerEmail" placeholder="you@example.com" />
+            </label>
+            <label>
+              <span>Date</span>
+              <input type="date" name="date" required />
+            </label>
+            <label>
+              <span>Time</span>
+              <input type="time" name="time" required />
+            </label>
+            <label>
+              <span>Address</span>
+              <input type="text" name="address" placeholder="Job location" required />
+            </label>
+          </div>
+
+          <label>
+            <span>Extra notes</span>
+            <textarea name="notes" rows="3" placeholder="Issue details, landmark, access notes, or anything helpful"></textarea>
+          </label>
+
+          <fieldset class="choice-grid" id="paymentChoiceGroup">
+            <legend>Request and payment</legend>
+            <p class="section-hint" id="paymentChoiceHint"></p>
+            <label class="choice-card choice-card--default" id="laterChoiceCard">
+              <input type="radio" name="paymentChoice" value="later" checked />
+              <div>
+                <strong id="laterChoiceTitle">Send request first</strong>
+                <span id="laterChoiceText">No payment is taken until the provider confirms the job.</span>
+              </div>
+            </label>
+            <label class="choice-card" id="depositChoiceCard">
+              <input type="radio" name="paymentChoice" value="deposit" />
+              <div>
+                <strong id="depositChoiceTitle">Pay a deposit now</strong>
+                <span id="depositChoiceText">Use the provider’s standard deposit to reserve the slot right away.</span>
+              </div>
+            </label>
+          </fieldset>
+
+          <div class="summary-bar card">
+            <div>
+              <span class="metric-label" id="amountDueNowLabel">Today</span>
+              <strong id="amountDueNow">XCD 0.00</strong>
+            </div>
+            <div>
+              <span class="metric-label" id="amountRemainingLabel">After review</span>
+              <strong id="amountRemaining">XCD 0.00</strong>
+            </div>
+          </div>
+          <p class="summary-note" id="bookingSummaryNote"></p>
+
+          <button type="submit" class="primary-button primary-button--block" id="bookingSubmitButton">Send booking request</button>
+        </form>
+      </div>
+    </section>
+
+    <section class="modal hidden" id="paymentModal" aria-modal="true" role="dialog" aria-labelledby="paymentTitle">
+      <div class="modal__panel modal__panel--narrow">
+        <button type="button" class="icon-button modal__close" data-close="paymentModal" aria-label="Close payment">×</button>
+        <div class="section__header section__header--tight">
+          <div>
+            <p class="eyebrow">Secure payment</p>
+            <h3 id="paymentTitle">Complete checkout</h3>
+          </div>
+          <span class="muted" id="paymentModeText"></span>
+        </div>
+
+        <div class="payment-summary card" id="paymentSummary"></div>
+
+        <form id="mockPaymentForm" class="stack">
+          <label>
+            <span>Cardholder name</span>
+            <input type="text" name="cardholderName" placeholder="Name on card" required />
+          </label>
+          <div class="form-grid form-grid--tight">
+            <label>
+              <span>Card number</span>
+              <input type="text" name="cardNumber" inputmode="numeric" placeholder="4242 4242 4242 4242" required />
+            </label>
+            <label>
+              <span>Expiry</span>
+              <input type="text" name="expiry" inputmode="numeric" placeholder="12/28" required />
+            </label>
+            <label>
+              <span>CVC</span>
+              <input type="text" name="cvc" inputmode="numeric" placeholder="123" required />
+            </label>
+          </div>
+          <button type="submit" class="primary-button primary-button--block">Pay securely</button>
+        </form>
+
+        <button type="button" class="primary-button primary-button--block hidden" id="liveCheckoutButton">Continue to live checkout</button>
+      </div>
+    </section>
+
+    <section class="modal hidden" id="businessModal" aria-modal="true" role="dialog" aria-labelledby="businessTitle">
+      <div class="modal__panel">
+        <button type="button" class="icon-button modal__close" data-close="businessModal" aria-label="Close business form">×</button>
+        <div class="section__header section__header--tight">
+          <div>
+            <p class="eyebrow">Business onboarding</p>
+            <h3 id="businessTitle">List your business on 473Link</h3>
+          </div>
+          <span class="muted">Quick application first. Add your logo and a cover photo straight from your camera roll if you want.</span>
+        </div>
+
+        <p class="section-hint business-intro">This first step should take about a minute. Start with the essentials and add optional profile details only if you want them to appear after approval.</p>
+
+        <form id="businessForm" class="stack">
+          <div class="form-grid form-grid--business-core">
+            <label>
+              <span>Owner name</span>
+              <input type="text" name="ownerName" placeholder="Who should we contact?" required />
+            </label>
+            <label>
+              <span>Business name</span>
+              <input type="text" name="businessName" placeholder="Your business name" required />
+            </label>
+            <label>
+              <span>Phone</span>
+              <input type="tel" name="businessPhone" placeholder="(473) 000-0000" required />
+            </label>
+            <label>
+              <span>Logo URL (optional)</span>
+              <input type="text" name="logo" placeholder="images/your-logo.png or https://example.com/logo.png" />
+            </label>
+            <label class="form-grid__full">
+              <span>Business logo</span>
+              <input type="file" name="logoFile" accept="image/*" />
+              <small>Upload straight from your camera roll, or use the logo path field below if you already have one.</small>
+            </label>
+            <label class="form-grid__full">
+              <span>Business cover photo</span>
+              <input type="file" name="coverPhotoFile" accept="image/*" />
+              <small>This photo will be used as the background for your business card.</small>
+            </label>
+            <label class="form-grid__full">
+              <span>Logo path or URL (optional fallback)</span>
+              <input type="text" name="logo" placeholder="images/your-logo.png or https://..." />
+            </label>
+            <label class="form-grid__full">
+              <span>Cover photo path or URL (optional fallback)</span>
+              <input type="text" name="coverImage" placeholder="images/your-cover.jpg or https://..." />
+            </label>
+            <label>
+              <span>Category</span>
+              <select name="category" id="businessCategory"></select>
+            </label>
+            <label>
+              <span>Parish</span>
+              <select name="parish" id="businessParish"></select>
+            </label>
+            <label class="form-grid__full">
+              <span>Short description</span>
+              <textarea name="summary" rows="3" placeholder="Tell customers what you do and why they should contact you." required></textarea>
+            </label>
+          </div>
+
+          <details class="form-details">
+            <summary>Add profile details now (optional)</summary>
+            <div class="stack form-details__content">
+              <div class="form-grid">
+                <label>
+                  <span>Email</span>
+                  <input type="email" name="email" placeholder="owner@example.com" />
+                </label>
+                <label>
+                  <span>Website or Instagram</span>
+                  <input type="text" name="website" placeholder="link, handle, or page" />
+                </label>
+                <label>
+                  <span>Average response time (mins)</span>
+                  <input type="number" name="responseMinutes" min="5" step="5" value="30" />
+                </label>
+              </div>
+
+              <label class="toggle toggle--stack form-toggle">
+                <input type="checkbox" name="sameDay" />
+                <span>
+                  <strong>Same-day jobs available</strong>
+                  <small>Switch this on if you usually accept urgent requests.</small>
+                </span>
+              </label>
+
+              <div class="form-grid">
+                <label>
+                  <span>Services offered</span>
+                  <input type="text" name="services" placeholder="Leak repair, pump install, AC service" />
+                </label>
+                <label>
+                  <span>Coverage areas</span>
+                  <input type="text" name="coverage" placeholder="Grand Anse, Woburn, Lance Aux Epines" />
+                </label>
+                <label>
+                  <span>Business hours</span>
+                  <input type="text" name="hours" placeholder="Mon-Sat · 8:00 AM-6:00 PM" />
+                </label>
+              </div>
+
+              <div class="form-section">
+                <div>
+                  <h4>Optional pricing</h4>
+                  <p class="section-hint">Leave this blank if you prefer to quote customers after you speak with them. Deposits are percentage-based and only apply when you set a starting price.</p>
+                </div>
+                <div class="form-grid">
+                  <label>
+                    <span>Starting call-out price (XCD)</span>
+                    <input type="number" name="startingPrice" id="startingPrice" min="0" step="1" placeholder="Optional" />
+                  </label>
+                  <label>
+                    <span>Deposit policy</span>
+                    <select name="depositPreset" id="depositPreset">
+                      <option value="0">No deposit</option>
+                      <option value="20">20% of starting price</option>
+                      <option value="30">30% of starting price</option>
+                      <option value="40">40% of starting price</option>
+                      <option value="50">50% of starting price</option>
+                      <option value="custom">Custom percentage</option>
+                    </select>
+                  </label>
+                  <label class="hidden" id="depositCustomWrap">
+                    <span>Custom deposit %</span>
+                    <input type="number" name="depositCustomPercent" id="depositCustomPercent" min="1" max="90" step="1" placeholder="Enter %" />
+                  </label>
+                </div>
+                <p class="section-hint" id="depositHelperText">Example: a 30% deposit on a XCD 150 call-out would ask the customer to pay XCD 45 up front.</p>
+              </div>
+
+              <label>
+                <span>Anything else we should know?</span>
+                <textarea name="note" rows="3" placeholder="Optional notes for the review team"></textarea>
+              </label>
+            </div>
+          </details>
+
+          <input type="hidden" name="plan" value="starter" />
+
+          <button type="submit" class="primary-button primary-button--block">Send application</button>
+        </form>
+      </div>
+    </section>
+
+
+    <section class="modal hidden" id="authModal" aria-modal="true" role="dialog" aria-labelledby="authTitle">
+      <div class="modal__panel modal__panel--narrow">
+        <button type="button" class="icon-button modal__close" data-close="authModal" aria-label="Close authentication">×</button>
+        <div class="section__header section__header--tight">
+          <div>
+            <p class="eyebrow">Your account</p>
+            <h3 id="authTitle">Log in to Link473</h3>
+          </div>
+          <span class="muted" id="authSubtitle">Use one account for bookings and business onboarding.</span>
+        </div>
+
+        <div class="auth-toggle" role="tablist" aria-label="Account mode">
+          <button type="button" class="chip active" id="authModeLogin">Log in</button>
+          <button type="button" class="chip" id="authModeSignup">Sign up</button>
+        </div>
+
+        <form id="authForm" class="stack">
+          <div class="form-grid auth-grid">
+            <label class="auth-signup-only hidden">
+              <span>Full name</span>
+              <input type="text" name="name" id="authName" placeholder="Your full name" />
+            </label>
+            <label>
+              <span>Email</span>
+              <input type="email" name="email" id="authEmail" placeholder="you@example.com" required />
+            </label>
+            <label>
+              <span>Password</span>
+              <input type="password" name="password" id="authPassword" placeholder="Minimum 8 characters" required />
+            </label>
+            <label class="auth-signup-only hidden">
+              <span>Phone</span>
+              <input type="tel" name="phone" id="authPhone" placeholder="(473) 000-0000" />
+            </label>
+            <label class="auth-signup-only hidden">
+              <span>Parish</span>
+              <select name="parish" id="authParish">
+                <option value="">Choose a parish</option>
+                <option>St. George's</option>
+                <option>St. Andrew</option>
+                <option>St. David</option>
+                <option>St. John</option>
+                <option>St. Mark</option>
+                <option>St. Patrick</option>
+                <option>Carriacou</option>
+              </select>
+            </label>
+            <label class="auth-signup-only hidden">
+              <span>Account type</span>
+              <select name="accountType" id="authAccountType">
+                <option value="customer">Customer</option>
+                <option value="business">Business owner</option>
+              </select>
+            </label>
+          </div>
+          <p class="section-hint" id="authHint">Log in to save your booking history and apply as a business.</p>
+          <button type="submit" class="primary-button primary-button--block" id="authSubmitButton">Continue</button>
+        </form>
+      </div>
+    </section>
+
+
+    <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
+    <script type="module" src="/app.js?v=6"></script>
+  </body>
+</html>

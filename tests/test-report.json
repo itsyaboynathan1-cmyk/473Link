@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "checkedAt": "2026-04-22T15:34:40.477Z",
+  "checks": [
+    "Config exposes built-in auth support.",
+    "Home page includes login and signup UI.",
+    "User signup returns a session token.",
+    "Authenticated profile lookup works.",
+    "Bookings are stored against the signed-in user.",
+    "Signed-in users can fetch their own booking history.",
+    "Business listing submissions now require and use the signed-in account.",
+    "Admin approval still works with auth-enabled listings."
+  ]
+}
