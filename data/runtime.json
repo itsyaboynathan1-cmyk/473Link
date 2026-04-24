@@ -16,6 +16,19 @@
       "verificationCode": "",
       "verificationExpiresAt": null,
       "createdAt": "2026-04-23T18:56:02.759Z"
+    },
+    {
+      "id": "USR-MOCXZIBW-6TAJ",
+      "name": "nathan fletcher",
+      "email": "nathan@grenadamarine.com",
+      "passwordHash": "f52554875eb154cbab1e4445631c2e37:eac490f0d8e53d1de40b2302e95fc6be2f1aafb39c4390a2e642ac0e5cf00c020c522a057d962c3d6c908f9827bd1b407a055ad2c6bc9fe3c77760602ad398d7",
+      "phone": "4734599629",
+      "parish": "St. George's",
+      "accountType": "business",
+      "isVerified": true,
+      "verificationCode": "",
+      "verificationExpiresAt": null,
+      "createdAt": "2026-04-24T13:24:24.332Z"
     }
   ],
   "bookings": [
@@ -44,14 +57,14 @@
   "payments": [],
   "businessListings": [
     {
-      "id": "LST-MOBUE5EQ-FHPS",
-      "ownerName": "Asha Noel",
-      "businessName": "Noel Plumbing Services",
-      "businessPhone": "(473) 555-2222",
-      "email": "asha@example.com",
+      "id": "LST-MOD7XD5E-K934",
+      "ownerName": "Kent",
+      "businessName": "Drip Stop",
+      "businessPhone": "+14734574540",
+      "email": "nathan@grenadamarine.com",
       "category": "Plumbing",
       "parish": "St. George's",
-      "summary": "Fast plumbing repairs for homes and rentals.",
+      "summary": "Reliable plumbing and maintenance services for homes and small projects.\nSpecializing in leak detection and repairs, water heater installation and servicing (including solar and tankless systems), water tanks, pumps, and filtration systems. Also offering fixture installations for kitchens and bathrooms, irrigation systems, and general plumbing maintenance.",
       "services": [
         "Plumbing"
       ],
@@ -66,14 +79,15 @@
       "sameDay": false,
       "plan": "starter",
       "website": "",
-      "logo": "",
+      "logo": "/uploads/logo-1777053760460-4955fe23.png",
+      "banner": "/uploads/banner-1777053760463-e0a7ad39.png",
       "note": "",
       "status": "approved",
-      "featured": false,
+      "featured": true,
       "verified": true,
-      "createdAt": "2026-04-23T18:56:02.786Z",
-      "reviewedAt": "2026-04-23T18:56:02.800Z",
-      "approvedAt": "2026-04-23T18:56:02.800Z"
+      "createdAt": "2026-04-24T18:02:40.466Z",
+      "reviewedAt": "2026-04-24T18:02:56.511Z",
+      "approvedAt": "2026-04-24T18:02:47.499Z"
     }
   ]
 }

@@ -7,6 +7,7 @@ import { Resend } from 'resend';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, 'public');
+const uploadsDir = path.join(publicDir, 'uploads');
 const dataDir = path.join(__dirname, 'data');
 const runtimeFile = path.join(dataDir, 'runtime.json');
 const port = Number(process.env.PORT || 3000);
@@ -15,6 +16,7 @@ const paymentMode = process.env.PAYMENT_MODE || 'mock';
 const paymentProviderName = process.env.PAYMENT_PROVIDER_NAME || (paymentMode === 'live_link' ? 'Hosted checkout' : 'Founding partner mode');
 const paymentUrlTemplate = process.env.PAYMENT_URL_TEMPLATE || '';
 const adminPasscode = process.env.ADMIN_PASSCODE || '473admin';
+const adminEmail = String(process.env.ADMIN_EMAIL || 'nathan@grenadamarine.com').trim().toLowerCase();
 const requestedAuthEmailMode = String(process.env.AUTH_EMAIL_MODE || '').trim().toLowerCase();
 const resendApiKey = String(process.env.RESEND_API_KEY || '').trim();
 const resendFromEmail = String(process.env.RESEND_FROM_EMAIL || '').trim();
@@ -37,6 +39,7 @@ const starterServiceIds = [
 ];
 
 if (!fs.existsSync(dataDir)) fs.mkdirSync(dataDir, { recursive: true });
+if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
 
 const MIME = {
   '.html': 'text/html; charset=UTF-8',
@@ -45,9 +48,32 @@ const MIME = {
   '.json': 'application/json; charset=UTF-8',
   '.svg': 'image/svg+xml',
   '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
   '.webp': 'image/webp',
   '.txt': 'text/plain; charset=UTF-8'
 };
+
+
+function saveBase64Image(value, prefix = 'image') {
+  const input = String(value || '').trim();
+  if (!input) return '';
+  if (input.startsWith('/uploads/') || input.startsWith('http://') || input.startsWith('https://') || input.startsWith('images/')) {
+    return input;
+  }
+
+  const match = input.match(/^data:(image\/(?:png|jpe?g|webp|gif|svg\+xml));base64,([\s\S]+)$/i);
+  if (!match) return '';
+
+  const mime = match[1].toLowerCase();
+  const extension = mime.includes('jpeg') ? 'jpg' : mime.includes('svg') ? 'svg' : mime.split('/')[1];
+  const safePrefix = String(prefix || 'image').replace(/[^a-z0-9_-]/gi, '').toLowerCase() || 'image';
+  const filename = `${safePrefix}-${Date.now()}-${crypto.randomBytes(4).toString('hex')}.${extension}`;
+  const filePath = path.join(uploadsDir, filename);
+
+  fs.writeFileSync(filePath, Buffer.from(match[2], 'base64'));
+  return `/uploads/${filename}`;
+}
 
 function runtimeDefaults() {
   return {
@@ -299,6 +325,7 @@ function normaliseRuntime(raw) {
           plan: ['starter', 'growth'].includes(String(listing.plan || 'starter')) ? String(listing.plan || 'starter') : 'starter',
           website: String(listing.website || ''),
           logo: String(listing.logo || ''),
+          banner: String(listing.banner || ''),
           note: String(listing.note || ''),
           status: ['pending', 'approved', 'rejected'].includes(String(listing.status || 'pending')) ? String(listing.status || 'pending') : 'pending',
           featured: toBoolean(listing.featured),
@@ -504,6 +531,7 @@ function createListingFromBody(body = {}, mode = 'full') {
     plan: ['starter', 'growth'].includes(String(body.plan || 'starter')) ? String(body.plan || 'starter') : 'starter',
     website: String(body.website || '').trim(),
     logo: String(body.logo || '').trim(),
+    banner: String(body.banner || '').trim(),
     note: String(body.note || '').trim()
   };
 
@@ -579,6 +607,7 @@ const server = http.createServer(async (req, res) => {
       showStarterListings: runtime.settings.showStarterListings,
       hiddenStarterIds: runtime.settings.hiddenStarterIds || [],
       authEnabled: true,
+      adminEmail,
       authEmailMode,
       authEmailConfigured: authEmailMode === 'resend'
     });
@@ -871,6 +900,8 @@ const server = http.createServer(async (req, res) => {
       const body = await readBody(req);
       const enrichedBody = {
         ...body,
+        logo: saveBase64Image(body.logo, 'logo'),
+        banner: saveBase64Image(body.banner, 'banner'),
         ownerName: body.ownerName || auth.user.name,
         email: body.email || auth.user.email,
         businessPhone: body.businessPhone || auth.user.phone,
@@ -889,11 +920,14 @@ const server = http.createServer(async (req, res) => {
   }
 
   if (pathname === '/api/admin/login' && req.method === 'POST') {
+    const auth = requireUser(req, res);
+    if (!auth) return;
     try {
       const body = await readBody(req);
-      if (String(body.passcode || '') !== adminPasscode) {
-        return sendJson(res, 401, { error: 'Incorrect passcode.' });
+      if (String(auth.user.email || '').trim().toLowerCase() !== adminEmail) {
+        return sendJson(res, 403, { error: 'Admin access is restricted to the approved admin account.' });
       }
+      // Admin access is tied to the signed-in account email. The old passcode is no longer required.
       const token = createId('ADM');
       adminSessions.add(token);
       return sendJson(res, 200, { token });

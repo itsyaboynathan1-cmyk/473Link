@@ -223,6 +223,8 @@ const STARTER_CONTACTS = {
   'tech-link-support': '(473) 443-9012'
 };
 
+const ADMIN_EMAIL = 'nathan@grenadamarine.com';
+
 const STORAGE = {
   favorites: 'link473-favorites',
   receipt: 'link473-receipt',
@@ -605,6 +607,7 @@ function listingToService(listing) {
     parish: listing.parish,
     mediaClass: getCategoryMediaClass(listing.category),
     logo: listing.logo || '',
+    banner: listing.banner || '',
     rating: 0,
     reviews: 0,
     responseMinutes: Number(listing.responseMinutes || 30),
@@ -669,6 +672,198 @@ function clearVerificationState() {
   if (els.authVerificationCode) els.authVerificationCode.value = '';
 }
 
+
+function isAdminUser() {
+  return Boolean(state.user && String(state.user.email || '').trim().toLowerCase() === ADMIN_EMAIL);
+}
+
+function syncAdminVisibility() {
+  const adminAllowed = isAdminUser();
+
+  if (els.dashboardLocked) {
+    els.dashboardLocked.classList.toggle('hidden', adminAllowed && Boolean(state.adminToken));
+    if (!adminAllowed) {
+      els.dashboardLocked.innerHTML = `
+        <div class="empty-state card">
+          <strong>Admin area is private.</strong>
+          <p class="muted">Admin tools are only available to the approved 473Link admin account.</p>
+        </div>
+      `;
+    }
+  }
+
+  if (els.adminLoginForm) {
+    els.adminLoginForm.classList.toggle('hidden', !adminAllowed || Boolean(state.adminToken));
+  }
+
+  if (els.dashboardContent && !adminAllowed) {
+    els.dashboardContent.classList.add('hidden');
+  }
+
+  const adminLinks = document.querySelectorAll('[href="#admin"], [href="#dashboard"], [data-admin-link], .admin-nav, .operator-link');
+  adminLinks.forEach((node) => node.classList.toggle('hidden', !adminAllowed));
+}
+
+function ensureUploadUi() {
+  if (!els.businessForm || els.businessForm.dataset.uploadReady === 'true') return;
+
+  const logoField = els.businessForm.querySelector('[name="logo"]');
+  if (!logoField) return;
+
+  logoField.type = 'hidden';
+  logoField.id = logoField.id || 'logoInput';
+
+  const logoBlock = document.createElement('div');
+  logoBlock.className = 'upload-field';
+  logoBlock.innerHTML = `
+    <label>Logo</label>
+    <div id="logoDropZone" class="drop-zone" tabindex="0">
+      <strong>Drop logo here</strong>
+      <span>or click to choose an image</span>
+      <div class="drop-zone__preview"></div>
+    </div>
+  `;
+  const logoLabel = logoField.closest('label') || logoField.parentElement;
+  if (logoLabel) logoLabel.replaceWith(logoBlock);
+  logoBlock.appendChild(logoField);
+
+  const bannerInput = document.createElement('input');
+  bannerInput.type = 'hidden';
+  bannerInput.name = 'banner';
+  bannerInput.id = 'bannerInput';
+
+  const bannerBlock = document.createElement('div');
+  bannerBlock.className = 'upload-field';
+  bannerBlock.innerHTML = `
+    <label>Banner photo</label>
+    <div id="bannerDropZone" class="drop-zone drop-zone--banner" tabindex="0">
+      <strong>Drop banner photo here</strong>
+      <span>or click to choose a wide image</span>
+      <div class="drop-zone__preview"></div>
+    </div>
+  `;
+  bannerBlock.appendChild(bannerInput);
+  logoBlock.insertAdjacentElement('afterend', bannerBlock);
+
+  setupImageDropZone('logoDropZone', logoField, 'Logo selected');
+  setupImageDropZone('bannerDropZone', bannerInput, 'Banner selected');
+
+  const style = document.createElement('style');
+  style.textContent = `
+    .drop-zone {
+      border: 2px dashed rgba(255,255,255,.25);
+      border-radius: 18px;
+      padding: 1rem;
+      min-height: 120px;
+      display: grid;
+      place-items: center;
+      gap: .35rem;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(255,255,255,.05);
+      color: inherit;
+    }
+    .drop-zone.dragging {
+      border-color: #22c55e;
+      background: rgba(34,197,94,.12);
+    }
+    .drop-zone span { color: rgba(255,255,255,.65); font-size: .9rem; }
+    .drop-zone__preview img {
+      max-width: 100%;
+      max-height: 140px;
+      border-radius: 14px;
+      object-fit: cover;
+      display: block;
+      margin-top: .5rem;
+    }
+    .drop-zone--banner .drop-zone__preview img {
+      max-height: 190px;
+      aspect-ratio: 16 / 7;
+      width: min(100%, 520px);
+    }
+    .service-card__media.has-banner,
+    .provider-hero.has-banner {
+      background-size: cover;
+      background-position: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-card__media.has-banner::before,
+    .provider-hero.has-banner::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(120deg, rgba(4,11,20,.82), rgba(4,11,20,.35));
+      z-index: 0;
+    }
+    .service-card__media.has-banner > *,
+    .provider-hero.has-banner > * {
+      position: relative;
+      z-index: 1;
+    }
+  `;
+  document.head.appendChild(style);
+
+  els.businessForm.dataset.uploadReady = 'true';
+}
+
+function setupImageDropZone(dropId, input, labelText) {
+  const drop = document.getElementById(dropId);
+  if (!drop || !input) return;
+
+  const chooseFile = () => {
+    const picker = document.createElement('input');
+    picker.type = 'file';
+    picker.accept = 'image/png,image/jpeg,image/webp,image/gif,image/svg+xml';
+    picker.addEventListener('change', () => {
+      if (picker.files?.[0]) readImageFile(picker.files[0], drop, input, labelText);
+    });
+    picker.click();
+  };
+
+  drop.addEventListener('click', chooseFile);
+  drop.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      chooseFile();
+    }
+  });
+  drop.addEventListener('dragover', (event) => {
+    event.preventDefault();
+    drop.classList.add('dragging');
+  });
+  drop.addEventListener('dragleave', () => drop.classList.remove('dragging'));
+  drop.addEventListener('drop', (event) => {
+    event.preventDefault();
+    drop.classList.remove('dragging');
+    const file = event.dataTransfer?.files?.[0];
+    if (file) readImageFile(file, drop, input, labelText);
+  });
+}
+
+function readImageFile(file, drop, input, labelText) {
+  if (!file.type.startsWith('image/')) {
+    showToast('Please choose an image file.', 'error');
+    return;
+  }
+  if (file.size > 4 * 1024 * 1024) {
+    showToast('Please choose an image under 4 MB.', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    input.value = String(reader.result || '');
+    const preview = drop.querySelector('.drop-zone__preview');
+    if (preview) preview.innerHTML = `<img src="${escapeHtml(input.value)}" alt="${escapeHtml(labelText)}">`;
+    const title = drop.querySelector('strong');
+    if (title) title.textContent = labelText;
+    showToast(`${labelText}.`);
+  };
+  reader.readAsDataURL(file);
+}
+
+
 function renderVerificationPreview() {
   if (!els.authVerificationPreview) return;
   const previewCode = state.authVerification.previewCode;
@@ -709,6 +904,7 @@ function updateAuthUi() {
   }
 
   els.clearLocalButton.textContent = loggedIn ? 'Refresh activity' : 'Sign in to view';
+  syncAdminVisibility();
 }
 
 function syncAuthMode() {
@@ -828,6 +1024,8 @@ async function restoreUserSession() {
     updateAuthUi();
     prefillFormsFromUser();
     await fetchMyBookings();
+    if (isAdminUser()) await unlockAdminDashboard(false);
+    else syncAdminVisibility();
   } catch {
     state.user = null;
     state.userToken = '';
@@ -857,6 +1055,8 @@ async function handleLogout(showMessage = true) {
   }
   state.userToken = '';
   state.user = null;
+  state.adminToken = '';
+  state.dashboard = null;
   state.bookings = [];
   clearVerificationState();
   saveLocalState();
@@ -896,6 +1096,7 @@ async function submitAuthForm(event) {
       updateAuthUi();
       prefillFormsFromUser();
       await fetchMyBookings();
+      if (state.adminToken && isAdminUser()) await fetchAdminDashboard();
       showToast(data.message || 'Email verified. You are now signed in.');
       return;
     }
@@ -941,6 +1142,8 @@ async function submitAuthForm(event) {
     updateAuthUi();
     prefillFormsFromUser();
     await fetchMyBookings();
+    if (isAdminUser()) await unlockAdminDashboard(false);
+    else syncAdminVisibility();
     showToast(isSignup ? 'Account created. You are now signed in.' : 'Welcome back.');
   } catch (error) {
     if (/verify/i.test(error.message) && state.authVerification.email) {
@@ -1168,7 +1371,7 @@ function renderServices() {
       const saved = state.favorites.has(service.id);
       return `
         <article class="service-card card">
-          <div class="service-card__media ${service.mediaClass}">
+          <div class="service-card__media ${service.mediaClass} ${service.banner ? 'has-banner' : ''}" ${service.banner ? `style="background-image: url(\'${escapeHtml(service.banner)}\')"` : ''}>
             ${service.logo ? `<img src="${escapeHtml(service.logo)}" class="service-logo" alt="${escapeHtml(service.name)} logo">` : ''}
             <div>
               <span class="status-pill">${escapeHtml(service.category)}</span>
@@ -1217,7 +1420,7 @@ function renderDetails(serviceId) {
   const favoriteLabel = state.favorites.has(service.id) ? 'Saved ♥' : 'Save service';
   const providerLabel = service.verified ? 'Verified provider' : 'Approved provider';
   els.detailsContent.innerHTML = `
-    <div class="provider-hero ${service.mediaClass}">
+    <div class="provider-hero ${service.mediaClass} ${service.banner ? 'has-banner' : ''}" ${service.banner ? `style="background-image: url(\'${escapeHtml(service.banner)}\')"` : ''}>
       ${service.logo ? `<img src="${escapeHtml(service.logo)}" class="service-logo service-logo--large" alt="${escapeHtml(service.name)} logo">` : ''}
       <div>
         <span class="status-pill">${providerLabel}</span>
@@ -1777,6 +1980,13 @@ async function refreshCatalog() {
 }
 
 async function fetchAdminDashboard() {
+  if (!isAdminUser()) {
+    state.adminToken = '';
+    state.dashboard = null;
+    saveLocalState();
+    syncAdminVisibility();
+    return;
+  }
   if (!state.adminToken) {
     state.dashboard = null;
     renderDashboardLocked();
@@ -1834,6 +2044,7 @@ async function submitBusinessListing(event) {
     businessPhone: formData.get('businessPhone'),
     email: formData.get('email'),
     logo: formData.get('logo'),
+    banner: formData.get('banner'),
     category: formData.get('category'),
     parish: formData.get('parish'),
     website: formData.get('website'),
@@ -1890,35 +2101,38 @@ async function clearLocalPreview() {
   showToast('Bookings refreshed.');
 }
 
-async function submitAdminLogin(event) {
-  event.preventDefault();
-  const formData = new FormData(els.adminLoginForm);
-  const passcode = String(formData.get('passcode') || '').trim();
-  if (!passcode) return;
-
-  const button = els.adminLoginForm.querySelector('button[type="submit"]');
-  button.disabled = true;
-  button.textContent = 'Unlocking…';
+async function unlockAdminDashboard(showMessage = false) {
+  if (!isAdminUser() || !state.userToken) return false;
   try {
     const response = await fetch('/api/admin/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ passcode })
+      headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': state.userToken
+      },
+      body: JSON.stringify({ email: state.user?.email || '' })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error || 'Unable to unlock dashboard.');
     state.adminToken = data.token;
     saveLocalState();
-    els.adminLoginForm.reset();
     await fetchAdminDashboard();
-    showToast('Operator dashboard unlocked.');
+    if (showMessage) showToast('Admin dashboard unlocked.');
+    return true;
   } catch (error) {
-    showToast(error.message, 'error');
-  } finally {
-    button.disabled = false;
-    button.textContent = 'Unlock dashboard';
+    state.adminToken = '';
+    saveLocalState();
+    renderDashboardLocked();
+    if (showMessage) showToast(error.message, 'error');
+    return false;
   }
 }
+
+async function submitAdminLogin(event) {
+  event.preventDefault();
+  await unlockAdminDashboard(true);
+}
+
 
 async function lockDashboard() {
   try {
@@ -2232,11 +2446,16 @@ async function init() {
   updateAuthUi();
   renderBookings();
   updateBusinessPricingControls();
+  ensureUploadUi();
   await fetchConfig();
   await refreshCatalog();
   await restoreUserSession();
-  if (state.adminToken) {
+  if (isAdminUser() && !state.adminToken) {
+    await unlockAdminDashboard(false);
+  } else if (state.adminToken) {
     await fetchAdminDashboard();
+  } else {
+    syncAdminVisibility();
   }
   await registerServiceWorker();
 }
