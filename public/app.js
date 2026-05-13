@@ -185,6 +185,17 @@ const STARTER_SERVICES = [
   }
 ];
 
+const FIXED_PARISHES = [
+  "St. George's",
+  "St. David",
+  "St. Andrew",
+  "St. Patrick",
+  "St. Mark",
+  "St. John",
+  "Carriacou",
+  "Petite Martinique"
+];
+
 const CATEGORY_MEDIA = {
   Marine: 'media-marine',
   Plumbing: 'media-home',
@@ -272,6 +283,7 @@ const els = {
   searchButton: document.querySelector('#searchButton'),
   heroStats: document.querySelector('#heroStats'),
   miniFeatured: document.querySelector('#miniFeatured'),
+  featuredBusinesses: document.querySelector('#featuredBusinesses'),
   categoryChips: document.querySelector('#categoryChips'),
   parishFilter: document.querySelector('#parishFilter'),
   sortFilter: document.querySelector('#sortFilter'),
@@ -1275,7 +1287,7 @@ const categories = [
   'all',
   ...new Set([...fixedCategories, ...dynamicCategories])
 ];
-  const parishes = ['all', ...new Set(catalog.map((item) => item.parish))];
+  const parishes = ['all', ...new Set([...FIXED_PARISHES, ...catalog.map((item) => item.parish).filter(Boolean)])];
 
   if (!categories.includes(state.filters.category)) state.filters.category = 'all';
   if (!parishes.includes(state.filters.parish)) state.filters.parish = 'all';
@@ -1352,9 +1364,98 @@ function buildMetaLine(service) {
   return service.verified ? 'New on 473Link · Approved listing' : 'New on 473Link';
 }
 
+
+function renderRatingStars(service) {
+  const rating = Number(service.rating || 0);
+  if (!rating) return '<span class="rating rating--new">New listing</span>';
+  const rounded = Math.round(rating);
+  const stars = Array.from({ length: 5 }, (_, index) => index < rounded ? '★' : '☆').join('');
+  return `<span class="rating" aria-label="${escapeHtml(rating.toFixed(1))} out of 5 stars">${stars} <strong>${escapeHtml(rating.toFixed(1))}</strong></span>`;
+}
+
+function renderPartnerBadges(service, compact = false) {
+  const badges = [];
+  if (service.featured) badges.push('<span class="premium-badge premium-badge--featured">★ Featured Partner</span>');
+  if (service.verified) badges.push('<span class="premium-badge premium-badge--verified">✓ Verified</span>');
+  if (service.tags?.includes('Founding Partner') || service.plan === 'founding') {
+    badges.push('<span class="premium-badge premium-badge--founding">Founding Partner</span>');
+  }
+  if (!badges.length && !compact) badges.push(`<span class="premium-badge">${escapeHtml(service.category)}</span>`);
+  return badges.join('');
+}
+
+function renderServiceCard(service, options = {}) {
+  const saved = state.favorites.has(service.id);
+  const featured = Boolean(service.featured);
+  const compact = Boolean(options.compact);
+  return `
+    <article class="service-card card ${featured ? 'service-card--featured' : ''} ${compact ? 'service-card--compact' : ''}">
+      <div class="service-card__media ${service.mediaClass} ${service.banner ? 'has-banner' : ''}" ${service.banner ? `style="background-image: url('${escapeHtml(service.banner)}')"` : ''}>
+        <div class="service-card__topline">
+          <span class="status-pill">${escapeHtml(service.category)}</span>
+          ${featured ? '<span class="featured-ribbon">Featured</span>' : ''}
+        </div>
+        <button type="button" class="icon-button" data-action="favorite" data-service-id="${escapeHtml(service.id)}" aria-label="Save service">
+          ${saved ? '♥' : '♡'}
+        </button>
+      </div>
+      <div class="service-card__body">
+        <div class="service-card__identity">
+          ${service.logo ? `<img src="${escapeHtml(service.logo)}" class="service-logo service-logo--floating" alt="${escapeHtml(service.name)} logo" onerror="this.remove()">` : `<div class="service-logo service-logo--fallback">${escapeHtml(service.name.slice(0, 1).toUpperCase())}</div>`}
+          <div>
+            <h3>${escapeHtml(service.name)}</h3>
+            <p class="muted">${escapeHtml(service.parish)} · ${escapeHtml(service.category)}</p>
+          </div>
+        </div>
+        <div class="featured-badge-row">${renderPartnerBadges(service, compact)}</div>
+        <p>${escapeHtml(service.summary)}</p>
+        <div class="service-card__meta">
+          <span>${renderRatingStars(service)}</span>
+          <span>${service.responseMinutes} min reply</span>
+          <span>${service.sameDay ? 'Fast response' : 'Profile live'}</span>
+        </div>
+        <div class="service-card__price">
+          <div>
+            <span class="metric-label">Starting from</span>
+            <strong>${formatStartsFrom(service.startingPrice)}</strong>
+          </div>
+          <div>
+            <span class="metric-label">Visibility</span>
+            <strong>${featured ? 'Top placement' : (service.verified ? 'Verified' : 'Standard')}</strong>
+          </div>
+        </div>
+        <div class="service-card__actions">
+          <button type="button" class="ghost-button" data-action="details" data-service-id="${escapeHtml(service.id)}">View profile</button>
+          <button type="button" class="primary-button" data-action="details" data-service-id="${escapeHtml(service.id)}">Contact</button>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderFeaturedBusinesses() {
+  if (!els.featuredBusinesses) return;
+  const featured = state.services.filter((service) => service.featured);
+  if (!featured.length) {
+    els.featuredBusinesses.innerHTML = `
+      <div class="empty-state card featured-empty">
+        <strong>No featured businesses yet.</strong>
+        <p class="muted">Feature approved businesses from the admin dashboard to place them here.</p>
+      </div>
+    `;
+    return;
+  }
+  els.featuredBusinesses.innerHTML = featured
+    .slice(0, 8)
+    .map((service) => renderServiceCard(service, { compact: true }))
+    .join('');
+}
+
 function renderServices() {
   const filtered = getFilteredServices();
   els.resultsLabel.textContent = `${filtered.length} business${filtered.length === 1 ? '' : 'es'} found`;
+  renderFeaturedBusinesses();
+
   if (!filtered.length) {
     els.servicesGrid.innerHTML = `
       <div class="empty-state card">
@@ -1367,49 +1468,7 @@ function renderServices() {
   }
 
   els.servicesGrid.innerHTML = filtered
-    .map((service) => {
-      const saved = state.favorites.has(service.id);
-      return `
-        <article class="service-card card">
-          <div class="service-card__media ${service.mediaClass} ${service.banner ? 'has-banner' : ''}" ${service.banner ? `style="background-image: url(\'${escapeHtml(service.banner)}\')"` : ''}>
-            ${service.logo ? `<img src="${escapeHtml(service.logo)}" class="service-logo" alt="${escapeHtml(service.name)} logo">` : ''}
-            <div>
-              <span class="status-pill">${escapeHtml(service.category)}</span>
-              <h3>${escapeHtml(service.name)}</h3>
-              <p>${escapeHtml(service.parish)}</p>
-            </div>
-            <button type="button" class="icon-button" data-action="favorite" data-service-id="${escapeHtml(service.id)}" aria-label="Save service">
-              ${saved ? '♥' : '♡'}
-            </button>
-          </div>
-          <div class="service-card__body">
-            <p>${escapeHtml(service.summary)}</p>
-            <div class="service-card__meta">
-              <span>${escapeHtml(buildMetaLine(service))}</span>
-              <span>${service.responseMinutes} min reply</span>
-              <span>${service.sameDay ? 'Fast response' : 'Profile live'}</span>
-            </div>
-            <div class="service-card__badges">
-              ${service.tags.slice(0, 3).map((item) => `<span class="badge">${escapeHtml(item)}</span>`).join('')}
-            </div>
-            <div class="service-card__price">
-              <div>
-                <span class="metric-label">Starting from</span>
-                <strong>${formatStartsFrom(service.startingPrice)}</strong>
-              </div>
-              <div>
-                <span class="metric-label">Contact</span>
-                <strong>${service.website ? 'Profile ready' : 'Call or WhatsApp'}</strong>
-              </div>
-            </div>
-            <div class="service-card__actions">
-              <button type="button" class="ghost-button" data-action="details" data-service-id="${escapeHtml(service.id)}">View profile</button>
-              <button type="button" class="primary-button" data-action="details" data-service-id="${escapeHtml(service.id)}">Contact business</button>
-            </div>
-          </div>
-        </article>
-      `;
-    })
+    .map((service) => renderServiceCard(service))
     .join('');
 }
 
