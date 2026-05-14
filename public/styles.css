@@ -2024,3 +2024,156 @@ body {
     border-radius: 24px;
   }
 }
+/* =========================================================
+   473Link Featured Business Premium Upgrade
+   Paste this at the bottom of public/styles.css
+   ========================================================= */
+
+.service-card--featured {
+  position: relative;
+  border: 2px solid rgba(247, 201, 72, 0.88) !important;
+  background:
+    radial-gradient(circle at top left, rgba(247, 201, 72, 0.20), transparent 34%),
+    linear-gradient(180deg, rgba(247, 201, 72, 0.12), rgba(255,255,255,0.055)) !important;
+  box-shadow:
+    0 0 0 1px rgba(247, 201, 72, 0.24),
+    0 22px 75px rgba(247, 201, 72, 0.24),
+    0 18px 55px rgba(0, 0, 0, 0.38) !important;
+  transform: translateY(-2px);
+  overflow: hidden;
+}
+
+.service-card--featured::after {
+  content: "";
+  position: absolute;
+  inset: -40%;
+  background: linear-gradient(115deg, transparent 0%, transparent 42%, rgba(255,255,255,0.13) 50%, transparent 58%, transparent 100%);
+  transform: translateX(-45%) rotate(8deg);
+  pointer-events: none;
+}
+
+.service-card--featured::before {
+  content: "★ Featured Partner";
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 7;
+  padding: 0.52rem 0.78rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 950;
+  letter-spacing: 0.025em;
+  color: #261800;
+  background: linear-gradient(135deg, #fff3b0, #f7c948 48%, #f59e0b);
+  box-shadow: 0 12px 30px rgba(247, 201, 72, 0.42);
+}
+
+.service-card--featured .service-card__media {
+  min-height: 210px;
+}
+
+.service-card--featured h3 {
+  color: #fff5cc;
+}
+
+.service-card--featured .primary-button {
+  background: linear-gradient(135deg, #f7c948, #f59e0b, #16a34a) !important;
+  color: #111827 !important;
+  font-weight: 950;
+  box-shadow: 0 18px 44px rgba(247, 201, 72, 0.30);
+}
+
+.service-card--featured .ghost-button {
+  border-color: rgba(247, 201, 72, 0.42) !important;
+  background: rgba(247, 201, 72, 0.12) !important;
+  color: #fff5cc !important;
+}
+
+.featured-ribbon,
+.premium-badge--featured {
+  background: linear-gradient(135deg, #fff3b0, #f7c948 48%, #f59e0b) !important;
+  color: #261800 !important;
+  border-color: rgba(247, 201, 72, 0.75) !important;
+  font-weight: 950;
+}
+
+.featured-strip .service-card--featured {
+  transform: scale(1.025);
+}
+
+.featured-strip .service-card--featured:hover,
+.service-card--featured:hover {
+  transform: translateY(-5px) scale(1.01);
+}
+
+.featured-perks {
+  margin-top: 1.25rem;
+  padding: clamp(1.15rem, 3vw, 1.5rem);
+  border: 1px solid rgba(247, 201, 72, 0.32) !important;
+  background:
+    radial-gradient(circle at top left, rgba(247, 201, 72, 0.18), transparent 34%),
+    linear-gradient(135deg, rgba(247, 201, 72, 0.10), rgba(255,255,255,0.045)) !important;
+  box-shadow: 0 20px 70px rgba(247, 201, 72, 0.12);
+}
+
+.featured-perks h3 {
+  color: #fff3b0;
+}
+
+.featured-perks__list {
+  list-style: none;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: grid;
+  gap: 0.7rem;
+}
+
+.featured-perks__list li {
+  position: relative;
+  padding: 0.78rem 0.85rem 0.78rem 2.3rem;
+  border-radius: 18px;
+  background: rgba(255,255,255,0.055);
+  border: 1px solid rgba(255,255,255,0.085);
+  color: rgba(255,255,255,0.82);
+  line-height: 1.35;
+}
+
+.featured-perks__list li::before {
+  content: "★";
+  position: absolute;
+  left: 0.85rem;
+  top: 0.78rem;
+  color: #f7c948;
+  font-weight: 900;
+}
+
+.featured-section .section__header h2::after {
+  content: " ★";
+  color: #f7c948;
+}
+
+@media (max-width: 720px) {
+  .service-card--featured {
+    transform: none;
+    border-width: 2px !important;
+  }
+
+  .service-card--featured::before {
+    top: 12px;
+    left: 12px;
+    font-size: 0.68rem;
+    padding: 0.46rem 0.66rem;
+  }
+
+  .service-card--featured .service-card__media {
+    min-height: 190px;
+  }
+
+  .featured-strip .service-card--featured {
+    transform: none;
+  }
+
+  .featured-perks__list li {
+    font-size: 0.92rem;
+  }
+}
