@@ -5,36 +5,23 @@
   },
   "users": [
     {
-      "id": "USR-MOBUE5DY-GZDI",
+      "id": "USR-MQ9FCXON-H21K",
       "name": "Asha Noel",
       "email": "asha@example.com",
-      "passwordHash": "b4470d0cd3d31e7a280cb2a948eb8692:7dfe7ad4a06a12f2e372629d59462dc4599495f8d2911a43fb684f4c104aaf10efc36bcd091f159a4f407fe24fab731e1171dc1aeef4a09b89b41bea4bd89dcc",
+      "passwordHash": "39e9e24bb48f02a5d3902fcce58b97de:3a9da777bce517d618529f70d0c843642b60b12605a823b25aff8921a58664859348f716f20bee0bc84960a0674c5f1987f0d8c00ecfab3d377fac5e8bc654f2",
       "phone": "(473) 555-2222",
       "parish": "St. George's",
       "accountType": "business",
       "isVerified": true,
       "verificationCode": "",
       "verificationExpiresAt": null,
-      "createdAt": "2026-04-23T18:56:02.759Z"
-    },
-    {
-      "id": "USR-MOCXZIBW-6TAJ",
-      "name": "nathan fletcher",
-      "email": "nathan@grenadamarine.com",
-      "passwordHash": "f52554875eb154cbab1e4445631c2e37:eac490f0d8e53d1de40b2302e95fc6be2f1aafb39c4390a2e642ac0e5cf00c020c522a057d962c3d6c908f9827bd1b407a055ad2c6bc9fe3c77760602ad398d7",
-      "phone": "4734599629",
-      "parish": "St. George's",
-      "accountType": "business",
-      "isVerified": true,
-      "verificationCode": "",
-      "verificationExpiresAt": null,
-      "createdAt": "2026-04-24T13:24:24.332Z"
+      "createdAt": "2026-06-11T11:39:04.199Z"
     }
   ],
   "bookings": [
     {
-      "userId": "USR-MOBUE5DY-GZDI",
-      "id": "BK-MOBUE5EF-VZ5Y",
+      "userId": "USR-MQ9FCXON-H21K",
+      "id": "BK-MQ9FCXOV-E9FC",
       "serviceId": "plumbing-nutmeg",
       "serviceName": "Nutmeg Plumbing Pro",
       "providerName": "Nutmeg Plumbing Pro",
@@ -51,20 +38,20 @@
       "amountDueNow": 0,
       "amountRemaining": 140,
       "status": "Requested",
-      "createdAt": "2026-04-23T18:56:02.775Z"
+      "createdAt": "2026-06-11T11:39:04.207Z"
     }
   ],
   "payments": [],
   "businessListings": [
     {
-      "id": "LST-MOD7XD5E-K934",
-      "ownerName": "Kent",
-      "businessName": "Drip Stop",
-      "businessPhone": "+14734574540",
-      "email": "nathan@grenadamarine.com",
+      "id": "LST-MQ9FCXP0-VBOE",
+      "ownerName": "Asha Noel",
+      "businessName": "Noel Plumbing Services",
+      "businessPhone": "(473) 555-2222",
+      "email": "asha@example.com",
       "category": "Plumbing",
       "parish": "St. George's",
-      "summary": "Reliable plumbing and maintenance services for homes and small projects.\nSpecializing in leak detection and repairs, water heater installation and servicing (including solar and tankless systems), water tanks, pumps, and filtration systems. Also offering fixture installations for kitchens and bathrooms, irrigation systems, and general plumbing maintenance.",
+      "summary": "Fast plumbing repairs for homes and rentals.",
       "services": [
         "Plumbing"
       ],
@@ -79,15 +66,15 @@
       "sameDay": false,
       "plan": "starter",
       "website": "",
-      "logo": "/uploads/logo-1777053760460-4955fe23.png",
-      "banner": "/uploads/banner-1777053760463-e0a7ad39.png",
+      "logo": "",
+      "banner": "",
       "note": "",
-      "status": "approved",
-      "featured": true,
-      "verified": true,
-      "createdAt": "2026-04-24T18:02:40.466Z",
-      "reviewedAt": "2026-04-24T18:02:56.511Z",
-      "approvedAt": "2026-04-24T18:02:47.499Z"
+      "status": "pending",
+      "featured": false,
+      "verified": false,
+      "createdAt": "2026-06-11T11:39:04.212Z",
+      "reviewedAt": null,
+      "approvedAt": null
     }
   ]
 }

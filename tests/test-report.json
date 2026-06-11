@@ -1,6 +1,6 @@
 {
-  "passed": true,
-  "checkedAt": "2026-04-23T18:56:02.803Z",
+  "passed": false,
+  "checkedAt": "2026-06-11T11:39:04.216Z",
   "checks": [
     "Config exposes built-in auth support.",
     "Home page includes login and signup UI.",
@@ -9,7 +9,8 @@
     "Authenticated profile lookup works after verification.",
     "Bookings are stored against the signed-in user.",
     "Signed-in users can fetch their own booking history.",
-    "Business listing submissions now require and use the signed-in account.",
-    "Admin approval still works with auth-enabled listings."
-  ]
+    "Business listing submissions now require and use the signed-in account."
+  ],
+  "error": "Expected values to be strictly equal:\n\n401 !== 200\n",
+  "logs": "473Link running on http://localhost:4173\n"
 }
