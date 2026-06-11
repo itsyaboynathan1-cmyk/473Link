@@ -9,17 +9,20 @@
       name="description"
       content="Discover Grenadian businesses, services, and opportunities in one premium mobile-first platform."
     />
-    <link rel="manifest" href="/manifest.json?v=7" />
-    <link rel="icon" href="/icon.svg?v=7" type="image/svg+xml" />
-    <link rel="icon" href="/icon-192.png?v=7" type="image/png" />
-    <link rel="apple-touch-icon" href="/icon-192.png?v=7" />
-    <link rel="stylesheet" href="/styles.css?v=7" />
+    <link rel="manifest" href="/manifest.json?v=8" />
+    <link rel="icon" href="/icon.svg?v=8" type="image/svg+xml" />
+    <link rel="icon" href="/icon-192.png?v=8" type="image/png" />
+    <link rel="apple-touch-icon" href="/icon-192.png?v=8" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css?v=8" />
   </head>
   <body>
     <div class="app-shell">
       <header class="topbar">
         <a href="#hero" class="brand" aria-label="473Link home">
-          <img src="/icon-192.png?v=7" alt="" class="brand__icon" width="56" height="56" />
+          <img src="/icon-192.png?v=8" alt="" class="brand__icon" width="56" height="56" />
           <span>
             <strong>473Link</strong>
             <small>Connect people, businesses, and opportunities.</small>
@@ -399,15 +402,42 @@
       </main>
 
       <footer class="footer">
-        <p><strong>473Link</strong> is built for Grenada and designed to feel good on phone first.</p>
-        <p>Founding partner onboarding, approval controls, and customer accounts are already built in so you can keep adding real businesses as you prepare for launch.</p>
+        <div class="footer__inner">
+          <div class="footer__brand">
+            <img src="/icon-192.png?v=8" alt="473Link" class="footer__logo" width="44" height="44" />
+            <div>
+              <strong class="footer__name">473Link</strong>
+              <small>Connect people, businesses &amp; opportunities.</small>
+            </div>
+          </div>
+          <p class="footer__tagline">Built for Grenada and designed to feel good on phone first. Founding partner onboarding, approval controls, and customer accounts are all built in.</p>
+          <nav class="footer__links" aria-label="Footer navigation">
+            <a href="#explore">Explore businesses</a>
+            <a href="#featured">Featured partners</a>
+            <a href="#business">List your business</a>
+            <a href="#dashboard">Operator dashboard</a>
+          </nav>
+          <p class="footer__copy">&copy; 2025 473Link &middot; Built for Grenada</p>
+        </div>
       </footer>
 
       <nav class="mobile-nav" aria-label="Mobile navigation">
-        <a href="#hero" class="mobile-nav__item">Home</a>
-        <a href="#explore" class="mobile-nav__item">Explore</a>
-        <a href="#business" class="mobile-nav__item">Partners</a>
-        <a href="#dashboard" class="mobile-nav__item">Admin</a>
+        <a href="#hero" class="mobile-nav__item">
+          <svg class="mobile-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+          <span>Home</span>
+        </a>
+        <a href="#explore" class="mobile-nav__item">
+          <svg class="mobile-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+          <span>Explore</span>
+        </a>
+        <a href="#business" class="mobile-nav__item">
+          <svg class="mobile-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/><line x1="12" y1="12" x2="12" y2="12.01"/></svg>
+          <span>Partners</span>
+        </a>
+        <a href="#dashboard" class="mobile-nav__item">
+          <svg class="mobile-nav__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          <span>Admin</span>
+        </a>
       </nav>
     </div>
 
@@ -750,7 +780,7 @@
 
     <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
 
-    <script src="/pwa-install.js?v=7"></script>
-    <script type="module" src="/app.js?v=7"></script>
+    <script src="/pwa-install.js?v=8"></script>
+    <script type="module" src="/app.js?v=8"></script>
   </body>
 </html>

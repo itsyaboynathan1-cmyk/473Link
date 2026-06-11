@@ -279,7 +279,7 @@ small {
 
 .ghost-button {
   padding: 0.82rem 1.05rem;
-  border: 1px solid rgba(13, 27, 42, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   color: var(--ink);
 }
 
@@ -287,7 +287,7 @@ small {
 .table-action {
   padding: 0.55rem 0.8rem;
   font-size: 0.85rem;
-  border: 1px solid rgba(13, 27, 42, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(7, 17, 29, 0.78);
   color: var(--ink);
 }
@@ -403,7 +403,7 @@ textarea,
 select {
   width: 100%;
   border-radius: 16px;
-  border: 1px solid rgba(13, 27, 42, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.12);
   padding: 0.9rem 1rem;
   background: rgba(7, 17, 29, 0.78);
   color: var(--ink);
@@ -432,9 +432,9 @@ textarea {
 .metric-card {
   padding: 1rem;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.85);
-  border: 1px solid rgba(13, 27, 42, 0.08);
-  box-shadow: 0 10px 26px rgba(13, 27, 42, 0.06);
+  background: rgba(19, 35, 56, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.22);
 }
 
 .stat-card strong,
@@ -2175,5 +2175,294 @@ body {
 
   .featured-perks__list li {
     font-size: 0.92rem;
+  }
+}
+
+
+/* =========================================================
+   473Link v8 — UI/UX Upgrade
+   ========================================================= */
+
+/* ── Typography: ensure Inter is used from Google Fonts ── */
+body {
+  font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+/* ── Stat cards: fix to match dark theme ── */
+.stat-card strong,
+.metric-card strong {
+  display: block;
+  font-size: 1.55rem;
+  font-weight: 800;
+  margin-top: 0.3rem;
+  color: var(--ink);
+}
+
+/* ── Inputs: improve placeholder contrast ── */
+::placeholder {
+  color: rgba(159, 177, 200, 0.6);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid rgba(214, 31, 38, 0.32);
+  border-color: rgba(214, 31, 38, 0.42);
+  background: rgba(7, 17, 29, 0.92);
+}
+
+/* ── Ghost button: better hover ── */
+.ghost-button:hover,
+.ghost-button:focus-visible {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+/* ── Mobile nav: icon + label layout ── */
+.mobile-nav__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.28rem;
+  color: rgba(219, 230, 243, 0.72);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  padding: 0.52rem 0.2rem;
+  border-radius: 16px;
+  transition: color 160ms ease, background 160ms ease;
+}
+
+.mobile-nav__icon {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  stroke-width: 1.75;
+}
+
+.mobile-nav__item:hover,
+.mobile-nav__item:focus-visible {
+  color: white;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* ── Category chips: better visual hierarchy ── */
+.chip {
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  padding: 0.48rem 0.85rem;
+  border: 1px solid transparent;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 120ms ease;
+}
+
+.chip:not(.active):hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(255, 255, 255, 0.14);
+  transform: translateY(-1px);
+}
+
+.chip.active {
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 20px rgba(214, 31, 38, 0.22);
+}
+
+/* ── Service cards: subtle lift on hover ── */
+.service-card {
+  transition: transform 200ms ease, box-shadow 200ms ease;
+  will-change: transform;
+}
+
+.service-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.36) !important;
+}
+
+/* ── Section eyebrow: more distinctive ── */
+.eyebrow {
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ── Primary button: richer gradient ── */
+.primary-button {
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  background: linear-gradient(135deg, #e8222a 0%, #c41c22 40%, #0a7d3e 100%);
+  box-shadow: 0 10px 28px rgba(214, 31, 38, 0.22);
+  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+
+.primary-button:hover,
+.primary-button:focus-visible {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 36px rgba(214, 31, 38, 0.32);
+  filter: brightness(1.08);
+}
+
+/* ── Hero stats: add subtle accent colours ── */
+.hero__stats .stat-card:first-child strong { color: #f5f7fb; }
+.hero__stats .stat-card:nth-child(2) strong { color: #a5f3d0; }
+.hero__stats .stat-card:nth-child(3) strong { color: #fde68a; }
+.hero__stats .stat-card:nth-child(4) strong { color: #bfdbfe; }
+
+/* ── Toast: more polish ── */
+.toast {
+  font-weight: 600;
+  font-size: 0.92rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.28);
+}
+
+/* ── Footer ── */
+.footer {
+  margin-top: 5rem;
+  padding: 0 0 7rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.footer__inner {
+  padding-top: 2.5rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.footer__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.footer__logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  flex: 0 0 auto;
+}
+
+.footer__name {
+  display: block;
+  font-size: 1.05rem;
+  color: var(--ink);
+}
+
+.footer__brand small {
+  font-size: 0.84rem;
+}
+
+.footer__tagline {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.65;
+  max-width: 52ch;
+  font-size: 0.96rem;
+}
+
+.footer__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.5rem;
+}
+
+.footer__links a {
+  color: rgba(159, 177, 200, 0.85);
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: color 140ms ease;
+  text-decoration: none;
+}
+
+.footer__links a:hover {
+  color: var(--ink);
+}
+
+.footer__copy {
+  margin: 0;
+  font-size: 0.82rem;
+  color: rgba(159, 177, 200, 0.5);
+}
+
+/* ── Admin table rows: improve dark styling ── */
+.table-wrap tr {
+  transition: background 140ms ease;
+}
+
+.table-wrap tr:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ── Form details summary: better style ── */
+.form-details summary {
+  color: var(--ink);
+  padding: 0.2rem 0;
+  user-select: none;
+}
+
+.form-details summary:hover {
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ── Booking & receipt items: better contrast ── */
+.booking-item,
+.receipt,
+.empty-state,
+.payment-summary,
+.summary-bar,
+.admin-lock,
+.account-panel,
+.hero__availability,
+.hero__mini,
+.form-section,
+.form-details,
+.helper-card {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* ── Account chip: better visibility ── */
+.account-chip {
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+}
+
+/* ── Search bar: bigger and stickier on mobile ── */
+.hero-search {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-search input {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Section headers: tighter spacing on desktop ── */
+@media (min-width: 760px) {
+  .footer__inner {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+  }
+
+  .footer__brand {
+    grid-column: 1;
+  }
+
+  .footer__tagline {
+    grid-column: 1;
+  }
+
+  .footer__links {
+    grid-column: 1 / -1;
+  }
+
+  .footer__copy {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ── Mobile: compact service card actions ── */
+@media (max-width: 720px) {
+  .service-card__actions,
+  .contact-actions {
+    grid-template-columns: 1fr 1fr;
   }
 }

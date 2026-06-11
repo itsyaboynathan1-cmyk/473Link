@@ -196,6 +196,34 @@ const FIXED_PARISHES = [
   "Petite Martinique"
 ];
 
+const CATEGORY_EMOJI = {
+  all: '🔍',
+  Marine: '⚓',
+  Plumbing: '🔧',
+  Cleaning: '✨',
+  'AC & Appliances': '❄️',
+  'Cooling & AC': '❄️',
+  Beauty: '💄',
+  'Beauty & Wellness': '💄',
+  'Health & Fitness': '💪',
+  Landscaping: '🌿',
+  Electrical: '⚡',
+  'Tech Help': '💻',
+  'Tech & IT': '💻',
+  'Restaurants & Food': '🍽️',
+  'Bars & Nightlife': '🍹',
+  'Shopping & Retail': '🛍️',
+  'Auto Services': '🚗',
+  'Auto Parts': '🚗',
+  'Home Services': '🏠',
+  Construction: '🔨',
+  Transportation: '🚌',
+  'Tours & Travel': '🌴',
+  'Professional Services': '💼',
+  'Events & Entertainment': '🎉',
+  Other: '🔗'
+};
+
 const CATEGORY_MEDIA = {
   Marine: 'media-marine',
   Plumbing: 'media-home',
@@ -1293,11 +1321,11 @@ const categories = [
   if (!parishes.includes(state.filters.parish)) state.filters.parish = 'all';
 
   els.categoryChips.innerHTML = categories
-    .map((category) => `
-      <button type="button" class="chip ${state.filters.category === category ? 'active' : ''}" data-category="${escapeHtml(category)}">
-        ${category === 'all' ? 'All categories' : escapeHtml(category)}
-      </button>
-    `)
+    .map((category) => {
+      const emoji = CATEGORY_EMOJI[category] || '📌';
+      const label = category === 'all' ? 'All' : escapeHtml(category);
+      return `<button type="button" class="chip ${state.filters.category === category ? 'active' : ''}" data-category="${escapeHtml(category)}">${emoji} ${label}</button>`;
+    })
     .join('');
 
   els.parishFilter.innerHTML = parishes
