@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import crypto from 'crypto';
-import { Resend } from 'resend';
 
 const __dirname = path.dirname(url.fileURLToPath(import.meta.url));
 const publicDir = path.join(__dirname, 'public');
@@ -22,8 +21,7 @@ const resendApiKey = String(process.env.RESEND_API_KEY || '').trim();
 const resendFromEmail = String(process.env.RESEND_FROM_EMAIL || '').trim();
 const resendFromName = String(process.env.RESEND_FROM_NAME || '473Link').trim() || '473Link';
 const resendReplyTo = String(process.env.RESEND_REPLY_TO || '').trim();
-const resendClient = resendApiKey ? new Resend(resendApiKey) : null;
-const authEmailMode = requestedAuthEmailMode || (resendClient && resendFromEmail ? 'resend' : 'preview');
+const authEmailMode = requestedAuthEmailMode || (resendApiKey && resendFromEmail ? 'resend' : 'preview');
 const adminSessions = new Set();
 const userSessions = new Map();
 const starterProviderCount = 8;
@@ -178,7 +176,7 @@ function buildVerificationEmailHtml(user) {
 async function deliverVerificationEmail(user) {
   const delivery = buildVerificationDelivery(user);
   if (authEmailMode !== 'resend') return delivery;
-  if (!resendClient || !resendFromEmail) {
+  if (!resendApiKey || !resendFromEmail) {
     throw new Error('Resend email delivery is not configured. Add RESEND_API_KEY and RESEND_FROM_EMAIL.');
   }
   const from = resendFromEmail.includes('<') ? resendFromEmail : `${resendFromName} <${resendFromEmail}>`;
@@ -189,11 +187,17 @@ async function deliverVerificationEmail(user) {
     html: buildVerificationEmailHtml(user)
   };
   if (resendReplyTo) emailPayload.replyTo = resendReplyTo;
-  const { data, error } = await resendClient.emails.send(emailPayload);
-  if (error) {
-    const message = typeof error === 'string' ? error : (error.message || 'Unable to send verification email.');
+  const resendRes = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${resendApiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(emailPayload)
+  });
+  const resendJson = await resendRes.json();
+  if (!resendRes.ok) {
+    const message = resendJson?.message || resendJson?.name || 'Unable to send verification email.';
     throw new Error(message);
   }
+  const data = resendJson;
   return {
     ...delivery,
     emailId: data?.id || ''
