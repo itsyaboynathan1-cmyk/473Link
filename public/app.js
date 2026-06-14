@@ -185,32 +185,6 @@ const STARTER_SERVICES = [
   }
 ];
 
-const CATEGORY_ICONS = {
-  Marine: '⚓',
-  Plumbing: '🔧',
-  Cleaning: '🧹',
-  'AC & Appliances': '❄️',
-  Beauty: '💅',
-  Landscaping: '🌿',
-  Electrical: '⚡',
-  'Tech Help': '💻',
-  'Restaurants & Food': '🍛',
-  'Bars & Nightlife': '🍹',
-  'Shopping & Retail': '🛍️',
-  'Auto Services': '🚗',
-  'Auto Parts': '⚙️',
-  'Home Services': '🏠',
-  'Cooling & AC': '❄️',
-  'Beauty & Wellness': '🌸',
-  Construction: '🏗️',
-  'Tech & IT': '💻',
-  'Events & Entertainment': '🎉',
-  'Health & Fitness': '💪',
-  Transportation: '🚐',
-  'Tours & Travel': '🌴',
-  'Professional Services': '📋',
-  Other: '✨'
-};
 
 const CATEGORY_MEDIA = {
   Marine: 'media-marine',
@@ -1314,10 +1288,9 @@ const categories = [
 
   els.categoryChips.innerHTML = categories
     .map((category) => {
-      const icon = category === 'all' ? '🌴' : (CATEGORY_ICONS[category] || '✨');
       return `
         <button type="button" class="chip ${state.filters.category === category ? 'active' : ''}" data-category="${escapeHtml(category)}">
-          <span class="chip-icon">${icon}</span>${category === 'all' ? 'All' : escapeHtml(category)}
+          ${category === 'all' ? 'All' : escapeHtml(category)}
         </button>`;
     })
     .join('');
@@ -1410,7 +1383,6 @@ function renderServices() {
   els.servicesGrid.innerHTML = filtered
     .map((service) => {
       const saved = state.favorites.has(service.id);
-      const catIcon = CATEGORY_ICONS[service.category] || '✨';
       const openStatus = isOpenNow(service.hours);
       const openBadge = openStatus === true
         ? `<span class="open-now-badge"><span class="open-now-dot"></span>Open now</span>`
@@ -1425,7 +1397,7 @@ function renderServices() {
           <div class="service-card__media ${service.mediaClass} ${service.banner ? 'has-banner' : ''}" ${service.banner ? `style="background-image: url(\'${escapeHtml(service.banner)}\')"` : ''}>
             ${service.logo ? `<img src="${escapeHtml(service.logo)}" class="service-logo" alt="${escapeHtml(service.name)} logo">` : ''}
             <div>
-              <span class="status-pill"><span class="chip-icon">${catIcon}</span>${escapeHtml(service.category)}</span>
+              <span class="status-pill">${escapeHtml(service.category)}</span>
               <h3>${escapeHtml(service.name)}</h3>
               <p>${escapeHtml(service.parish)}</p>
             </div>
@@ -1442,7 +1414,7 @@ function renderServices() {
             </div>
             <div class="service-card__badges">
               ${tags.map((item) => `<span class="badge">${escapeHtml(item)}</span>`).join('')}
-              ${service.featured ? '<span class="badge" style="background:rgba(242,194,48,0.2);color:#ffe08a;border:1px solid rgba(242,194,48,0.28);">⭐ Featured</span>' : ''}
+              ${service.featured ? '<span class="badge" style="background:rgba(242,194,48,0.2);color:#ffe08a;border:1px solid rgba(242,194,48,0.28);">Featured</span>' : ''}
             </div>
             <div class="service-card__price">
               <div>
@@ -1456,9 +1428,9 @@ function renderServices() {
             </div>
             <div class="service-card__actions">
               <button type="button" class="ghost-button" data-action="details" data-service-id="${escapeHtml(service.id)}">View profile</button>
-              ${waHref ? `<a class="wa-btn" href="${escapeHtml(waHref)}" target="_blank" rel="noreferrer" data-service-id="${escapeHtml(service.id)}" data-listing-id="${escapeHtml(service.listingId || '')}">💬 WhatsApp</a>` : `<button type="button" class="primary-button" data-action="details" data-service-id="${escapeHtml(service.id)}">Contact</button>`}
+              ${waHref ? `<a class="wa-btn" href="${escapeHtml(waHref)}" target="_blank" rel="noreferrer" data-service-id="${escapeHtml(service.id)}" data-listing-id="${escapeHtml(service.listingId || '')}">WhatsApp</a>` : `<button type="button" class="primary-button" data-action="details" data-service-id="${escapeHtml(service.id)}">Contact</button>`}
             </div>
-            ${waShareHref ? `<div class="card-share-row"><a class="wa-btn" href="${escapeHtml(waShareHref)}" target="_blank" rel="noreferrer" style="background:rgba(37,211,102,0.15);color:#4ade80;border:1px solid rgba(37,211,102,0.3);" title="Share this business on WhatsApp">📤 Share</a></div>` : ''}
+            ${waShareHref ? `<div class="card-share-row"><a class="wa-btn" href="${escapeHtml(waShareHref)}" target="_blank" rel="noreferrer" style="background:rgba(37,211,102,0.15);color:#4ade80;border:1px solid rgba(37,211,102,0.3);" title="Share this business on WhatsApp">Share via WhatsApp</a></div>` : ''}
           </div>
         </article>
       `;
@@ -1478,7 +1450,6 @@ function renderDetails(serviceId) {
     : openStatus === false
       ? `<span class="closed-badge">Closed now</span>`
       : '';
-  const catIcon = CATEGORY_ICONS[service.category] || '✨';
   const waShareHref = getWhatsAppShareHref(service);
   const listingId = service.listingId || (service.source === 'listing' ? service.id.replace(/^listing-/, '') : null);
 
@@ -1486,7 +1457,7 @@ function renderDetails(serviceId) {
     <div class="provider-hero ${service.mediaClass} ${service.banner ? 'has-banner' : ''}" ${service.banner ? `style="background-image: url(\'${escapeHtml(service.banner)}\')"` : ''}>
       ${service.logo ? `<img src="${escapeHtml(service.logo)}" class="service-logo service-logo--large" alt="${escapeHtml(service.name)} logo">` : ''}
       <div>
-        <span class="status-pill"><span class="chip-icon">${catIcon}</span>${providerLabel}</span>
+        <span class="status-pill">${providerLabel}</span>
         <h2 id="drawerTitle">${escapeHtml(service.name)}</h2>
         <p>${escapeHtml(service.summary)}</p>
         <div class="provider-tags">
@@ -1501,7 +1472,7 @@ function renderDetails(serviceId) {
       <h3>About this provider</h3>
       <p>${escapeHtml(service.about || service.summary)}</p>
       ${renderContactActions(service)}
-      ${waShareHref ? `<div class="card-share-row" style="margin-top:0.75rem;"><a class="wa-btn" href="${escapeHtml(waShareHref)}" target="_blank" rel="noreferrer">📤 Share on WhatsApp</a></div>` : ''}
+      ${waShareHref ? `<div class="card-share-row" style="margin-top:0.75rem;"><a class="wa-btn" href="${escapeHtml(waShareHref)}" target="_blank" rel="noreferrer">Share on WhatsApp</a></div>` : ''}
     </div>
     <div class="provider-section">
       <h3>Services included</h3>
@@ -1509,7 +1480,7 @@ function renderDetails(serviceId) {
     </div>
     <div class="provider-section">
       <h3>Hours &amp; coverage</h3>
-      <div class="provider-tags"><span>🕐 ${escapeHtml(service.hours)}</span>${service.coverage.map((item) => `<span>📍 ${escapeHtml(item)}</span>`).join('')}</div>
+      <div class="provider-tags"><span>${escapeHtml(service.hours)}</span>${service.coverage.map((item) => `<span>${escapeHtml(item)}</span>`).join('')}</div>
     </div>
     <div class="provider-section card" style="padding:1rem;">
       <div class="service-card__price">
@@ -1519,7 +1490,7 @@ function renderDetails(serviceId) {
         </div>
         <div>
           <span class="metric-label">Status</span>
-          <strong>${service.featured ? '⭐ Featured' : service.verified ? '✓ Verified' : 'Approved'}</strong>
+          <strong>${service.featured ? 'Featured' : service.verified ? 'Verified' : 'Approved'}</strong>
         </div>
       </div>
       <div class="provider-cta" style="margin-top:0.75rem;">
@@ -2721,8 +2692,8 @@ async function fetchEvents() {
                 <h4>${escapeHtml(event.title)}</h4>
                 <p>${escapeHtml(event.description || '')}</p>
                 <div class="event-meta">
-                  <span>📅 ${escapeHtml(event.category || 'Community')}</span>
-                  ${event.location ? `<span>📍 ${escapeHtml(event.location)}</span>` : ''}
+                  <span>${escapeHtml(event.category || 'Community')}</span>
+                  ${event.location ? `<span>${escapeHtml(event.location)}</span>` : ''}
                 </div>
               </div>
             </div>`;
@@ -2750,7 +2721,7 @@ async function fetchDeals() {
             <div class="deal-discount">${escapeHtml(deal.discount || 'OFFER')}</div>
             <h4>${escapeHtml(deal.title)}</h4>
             <p class="muted">${escapeHtml(deal.businessName)} — ${escapeHtml(deal.description || '')}</p>
-            ${deal.expiresAt ? `<p class="deal-expires">🏷️ Expires ${formatDate(deal.expiresAt)}</p>` : ''}
+            ${deal.expiresAt ? `<p class="deal-expires">Expires ${formatDate(deal.expiresAt)}</p>` : ''}
           </div>`).join('')}
       </div>
     `;
@@ -2932,11 +2903,11 @@ function buildCarousel() {
         <div class="service-card__media ${service.mediaClass} ${service.banner ? 'has-banner' : ''}" ${service.banner ? `style="background-image:url('${escapeHtml(service.banner)}')"` : ''}>
           ${service.logo ? `<img src="${escapeHtml(service.logo)}" class="service-logo" alt="${escapeHtml(service.name)} logo">` : ''}
           <div>
-            <span class="status-pill">${CATEGORY_ICONS[service.category] || '✨'} ${escapeHtml(service.category)}</span>
+            <span class="status-pill">${escapeHtml(service.category)}</span>
             <h3>${escapeHtml(service.name)}</h3>
             <p>${escapeHtml(service.parish)}</p>
           </div>
-          ${service.featured ? '<span class="badge" style="align-self:flex-start;background:rgba(242,194,48,0.28);color:#ffe08a;border:1px solid rgba(242,194,48,0.35);">⭐ Featured</span>' : ''}
+          ${service.featured ? '<span class="badge" style="align-self:flex-start;background:rgba(242,194,48,0.28);color:#ffe08a;border:1px solid rgba(242,194,48,0.35);">Featured</span>' : ''}
         </div>
         <div class="service-card__body">
           <p>${escapeHtml(service.summary)}</p>
@@ -2946,7 +2917,7 @@ function buildCarousel() {
           </div>
           <div class="service-card__actions" style="margin-top:0.75rem;">
             <button type="button" class="ghost-button" data-action="details" data-service-id="${escapeHtml(service.id)}">View profile</button>
-            ${waHref ? `<a class="wa-btn" href="${escapeHtml(waHref)}" target="_blank" rel="noreferrer">💬 WhatsApp</a>` : `<button type="button" class="primary-button" data-action="details" data-service-id="${escapeHtml(service.id)}">Contact</button>`}
+            ${waHref ? `<a class="wa-btn" href="${escapeHtml(waHref)}" target="_blank" rel="noreferrer">WhatsApp</a>` : `<button type="button" class="primary-button" data-action="details" data-service-id="${escapeHtml(service.id)}">Contact</button>`}
           </div>
         </div>
       </article>`;

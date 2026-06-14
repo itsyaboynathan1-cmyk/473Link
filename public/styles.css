@@ -1898,8 +1898,6 @@ body {
   box-shadow: 0 28px 56px rgba(0,0,0,0.4) !important;
 }
 
-/* ── Category icon emoji chip ─────────────────────────────── */
-.chip-icon { margin-right: 0.3rem; }
 
 /* ── Open Now badge ───────────────────────────────────────── */
 .open-now-badge {
@@ -2042,7 +2040,6 @@ body {
 }
 .grenada-pride-banner h3 { margin: 0 0 0.5rem; font-size: 1.4rem; }
 .grenada-pride-banner p  { margin: 0; color: rgba(245,247,251,0.8); font-size: 0.95rem; line-height: 1.6; }
-.spice-icons { font-size: 2rem; margin-bottom: 0.75rem; display: block; }
 
 /* ── Tourism section ──────────────────────────────────────── */
 .tourism-hero {
@@ -2054,12 +2051,14 @@ body {
   border: 1px solid rgba(12,143,70,0.2);
 }
 .tourism-hero::after {
-  content: "🌿🌴🌺🐠";
+  content: '';
   position: absolute;
-  right: 1.5rem;
-  top: 1.5rem;
-  font-size: 2.5rem;
-  opacity: 0.35;
+  right: -2rem;
+  top: -2rem;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(12,143,70,0.18) 0%, transparent 70%);
   pointer-events: none;
 }
 
@@ -2078,7 +2077,6 @@ body {
   transition: transform 200ms ease, box-shadow 200ms ease;
 }
 .attraction-card:hover { transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.32); }
-.attraction-icon { font-size: 2.2rem; display: block; margin-bottom: 0.35rem; }
 .attraction-card h4 { margin: 0; font-size: 1.02rem; }
 .attraction-card p  { margin: 0; color: var(--muted); font-size: 0.88rem; line-height: 1.5; }
 .attraction-tag {
@@ -2088,7 +2086,16 @@ body {
   background: rgba(242,194,48,0.12);
   color: var(--gold);
   font-size: 0.75rem;
-  font-weight: 700;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.attraction-tag--label {
+  background: rgba(12,143,70,0.18);
+  color: #5dde8a;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 0.25rem;
 }
 
 /* ── Essentials guide ─────────────────────────────────────── */
