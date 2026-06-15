@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">473Link</title>
+  <desc id="desc">White rounded square with 473 in Grenada flag colours and a gold star.</desc>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="18" stdDeviation="18" flood-color="#0d1b2a" flood-opacity="0.12"/>
+    </filter>
+  </defs>
+  <!-- Outer background -->
+  <rect width="512" height="512" rx="116" fill="#f5f7fb"/>
+  <!-- White card -->
+  <rect x="52" y="52" width="408" height="408" rx="96" fill="#ffffff" stroke="#dfe7f1" stroke-width="8" filter="url(#shadow)"/>
+  <!-- Gold star (Grenada-inspired), centred at top of card -->
+  <polygon fill="#f2c230" points="256,80 267,114 303,114 274,135 285,169 256,148 227,169 238,135 209,114 245,114"/>
+  <!-- 4 in green -->
+  <text x="52" y="390" font-size="210" font-weight="900" font-family="Arial, Helvetica, sans-serif" fill="#0c8f46">4</text>
+  <!-- 7 in gold -->
+  <text x="172" y="390" font-size="210" font-weight="900" font-family="Arial, Helvetica, sans-serif" fill="#f2c230">7</text>
+  <!-- 3 in red -->
+  <text x="288" y="390" font-size="210" font-weight="900" font-family="Arial, Helvetica, sans-serif" fill="#d61f26">3</text>
+</svg>

@@ -1,13 +1,12 @@
-const CACHE_NAME = '473link-shell-v7';
+const CACHE_NAME = '473link-shell-v9';
 const APP_SHELL = [
   '/',
   '/index.html',
-  '/styles.css?v=7',
-  '/app.js?v=7',
-  '/pwa-install.js?v=7',
-  '/manifest.json?v=7',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/styles.css?v=9',
+  '/app.js?v=9',
+  '/pwa-install.js?v=9',
+  '/manifest.json?v=9',
+  '/icon.svg'
 ];
 
 self.addEventListener('install', (event) => {

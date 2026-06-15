@@ -220,7 +220,7 @@ small {
 }
 
 .brand__digit--4 {
-  color: var(--red);
+  color: var(--green);
 }
 
 .brand__digit--7 {
@@ -228,7 +228,7 @@ small {
 }
 
 .brand__digit--3 {
-  color: var(--green);
+  color: var(--red);
 }
 
 .desktop-nav {
